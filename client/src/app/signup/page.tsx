@@ -45,23 +45,24 @@ export default function SignUp() {
   };
 
   return (
-    <main className="min-h-screen bg-[#1a1a24] flex items-center justify-center">
-      <div className="space-y-6 bg-[#242436] p-8 rounded-xl shadow-lg">
+    <main className="min-h-screen flex items-center justify-center bg-primary/10 dark:bg-background">
+      <div className="space-y-6 bg-card p-8 rounded-xl shadow-lg">
         <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold text-white">Create an account</h1>
-          <p className="text-gray-400">Enter your information to get started</p>
+          <h1 className="text-3xl font-bold">Create an account</h1>
+          <p className="text-card-foreground/50">
+            Enter your information to get started
+          </p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="firstName" className="text-gray-300">
+              <Label htmlFor="firstName" className="text-card-foreground/70">
                 First name
               </Label>
               <Input
                 id="firstName"
                 {...register("firstName")}
-                className="bg-[#2a2a3c] border-[#3a3a4c] text-white"
                 placeholder="John"
               />
               {errors.firstName && (
@@ -72,13 +73,10 @@ export default function SignUp() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="lastName" className="text-gray-300">
-                Last name
-              </Label>
+              <Label htmlFor="lastName">Last name</Label>
               <Input
                 id="lastName"
                 {...register("lastName")}
-                className="bg-[#2a2a3c] border-[#3a3a4c] text-white"
                 placeholder="Doe"
               />
               {errors.lastName && (
@@ -90,14 +88,11 @@ export default function SignUp() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-gray-300">
-              Email
-            </Label>
+            <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               type="email"
               {...register("email")}
-              className="bg-[#2a2a3c] border-[#3a3a4c] text-white"
               placeholder="john.doe@example.com"
             />
             {errors.email && (
@@ -106,15 +101,12 @@ export default function SignUp() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-gray-300">
-              Password
-            </Label>
+            <Label htmlFor="password">Password</Label>
             <Input
               id="password"
               type="password"
               autoComplete="new-password"
               {...register("password")}
-              className="bg-[#2a2a3c] border-[#3a3a4c] text-white"
             />
             {errors.password && (
               <p className="text-sm text-red-500">{errors.password.message}</p>
@@ -122,14 +114,11 @@ export default function SignUp() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword" className="text-gray-300">
-              Confirm password
-            </Label>
+            <Label htmlFor="confirmPassword">Confirm password</Label>
             <Input
               id="confirmPassword"
               type="password"
               {...register("confirmPassword")}
-              className="bg-[#2a2a3c] border-[#3a3a4c] text-white"
             />
             {errors.confirmPassword && (
               <p className="text-sm text-red-500">
@@ -140,14 +129,14 @@ export default function SignUp() {
 
           <Button
             type="submit"
-            className="w-full bg-[#3b82f6] hover:bg-[#2563eb] text-white font-medium py-2 px-4 rounded-lg transition-colors cursor-pointer"
+            className="w-full cursor-pointer transition-colors"
           >
             Sign Up
           </Button>
 
-          <div className="text-center text-sm text-gray-400">
+          <div className="text-center text-sm text-foreground/60">
             Already have an account?{" "}
-            <Link href="/login" className="text-[#3b82f6] hover:underline">
+            <Link href="/login" className="text-primary hover:underline">
               Log in
             </Link>
           </div>
