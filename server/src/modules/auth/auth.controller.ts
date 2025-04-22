@@ -1,11 +1,10 @@
-import { Body, Controller, Post, Logger } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { User as UserModel } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
-  private readonly logger = new Logger(AuthController.name);
   @Post('signup')
   async signup(
     @Body()
@@ -17,7 +16,22 @@ export class AuthController {
       displayName?: string;
     },
   ): Promise<UserModel> {
-    this.logger.log('Received signup request', userData);
     return this.authService.signup(userData);
+  }
+  @Post('login')
+  async login(
+    @Body()
+    userData: {
+      email: string;
+      password: string;
+    },
+  ): Promise<{ access_token: string }> {
+    const user = await this.authService.validateUser(
+      userData.email,
+      userData.password,
+    );
+
+    // If the user is valid, generate a JWT token
+    return this.authService.login(user);
   }
 }
