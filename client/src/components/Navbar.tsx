@@ -1,20 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import axios from "axios";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    try {
-      await axios.post("/api/logout"); // This will clear the cookie on the server
-      router.push("/login"); // Redirect to login after logout
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
+  const { logout } = useAuth();
 
   return (
     <header className="w-full bg-card mb-10">
@@ -24,7 +14,7 @@ export default function Navbar() {
         </Link>
 
         <button
-          onClick={handleLogout}
+          onClick={logout}
           className="hover:text-foreground/80 cursor-pointer"
         >
           Logout

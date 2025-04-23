@@ -9,11 +9,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import axios from "axios";
 import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LogIn() {
   const [loginError, setLoginError] = useState("");
+  const { login } = useAuth();
   const router = useRouter();
 
   const {
@@ -25,24 +26,12 @@ export default function LogIn() {
   });
 
   const onSubmit = async (data: LogInData) => {
-    try {
-      const response = await axios.post("/api/login", {
-        email: data.email,
-        password: data.password,
-      });
-
-      if (response.status === 200) {
-        router.push("/");
-      } else {
-        setLoginError("Invalid credentials. Please try again.");
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const message = error.response?.data?.message || "An error occurred";
-        setLoginError(message);
-      } else {
-        setLoginError("An unexpected error occurred. Please try again.");
-      }
+    const response = await login(data.email, data.password);
+    if (response.success) {
+      // Redirect to home page after successful login
+      router.push("/");
+    } else {
+      setLoginError(response.message || "Login failed. Please try again.");
     }
   };
 
