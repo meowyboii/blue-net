@@ -1,6 +1,8 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { User as UserModel } from '@prisma/client';
+import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -32,6 +34,12 @@ export class AuthController {
     );
 
     // If the user is valid, generate a JWT token
-    return this.authService.login(user);
+    const token = this.authService.login(user);
+    return token;
+  }
+  @UseGuards(AuthGuard('jwt'))
+  @Get('me')
+  getProfile(@Req() req: Request) {
+    return req.user; // Contains userId and email from JwtStrategy
   }
 }
