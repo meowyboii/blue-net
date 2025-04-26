@@ -6,8 +6,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   // Use cookie-parser middleware globally
   app.use(cookieParser());
-  // Enable CORS for all origins and methods
-  app.enableCors();
+  // Enable CORS for frontend origin and allow sending credentials
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  });
   await app.listen(process.env.PORT ?? 3001);
 }
 bootstrap();
