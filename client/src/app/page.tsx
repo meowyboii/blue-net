@@ -18,6 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { createPost } from "@/lib/posts/createPost";
 import React from "react";
+import PostFeed from "@/components/PostFeed";
 
 export default function Home() {
   const [loading, setLoading] = React.useState(false);
@@ -56,7 +57,7 @@ export default function Home() {
       <main className="w-full grid grid-cols-[1fr_2fr_1fr] gap-10">
         <div></div>
         <div className="py-4 px-[6vw]">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center mb-10">
             <h2 className="text-2xl font-semibold">Feed</h2>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
@@ -90,6 +91,7 @@ export default function Home() {
               </DialogContent>
             </Dialog>
           </div>
+          <PostFeed />
         </div>
         <div></div>
       </main>
