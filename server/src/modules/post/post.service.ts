@@ -28,6 +28,20 @@ export class PostService {
       cursor,
       where,
       orderBy,
+      include: {
+        author: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            displayName: true,
+            bio: true,
+            avatarUrl: true,
+            createdAt: true,
+          },
+        },
+      },
     });
   }
 
