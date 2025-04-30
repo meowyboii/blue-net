@@ -16,7 +16,6 @@ export default function PostFeed() {
         // pageParam is the `skip`
         try {
           const res = await getPosts({ skip: pageParam, take: 5 });
-          await new Promise((resolve) => setTimeout(resolve, 2000));
           return res;
         } catch (error) {
           // Throw error so React Query knows it's an error
