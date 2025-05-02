@@ -1,8 +1,9 @@
 "use client";
 
 import { Post } from "@/types/post";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ThumbsUpIcon } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface PostCardProps {
   post: Post | null;
@@ -13,10 +14,23 @@ const reactions = ["👍", "❤️", "😂", "😮", "😢", "😡"];
 export default function PostCard({ post }: PostCardProps) {
   const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
   const [isHovering, setIsHovering] = useState(false);
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleReaction = (reaction: string) => {
     setSelectedReaction(reaction);
     setIsHovering(false);
+    clearTimeout(hideTimeoutRef.current!);
+  };
+
+  const handleMouseEnter = () => {
+    clearTimeout(hideTimeoutRef.current!);
+    setIsHovering(true);
+  };
+
+  const handleMouseLeave = () => {
+    hideTimeoutRef.current = setTimeout(() => {
+      setIsHovering(false);
+    }, 500);
   };
 
   return (
@@ -33,18 +47,37 @@ export default function PostCard({ post }: PostCardProps) {
         <div className="flex relative">
           <button
             className="cursor-pointer text-xl hover:text-foreground/70 transition-all"
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
           >
-            {selectedReaction ? selectedReaction : <ThumbsUpIcon size={28} />}
+            {selectedReaction ? (
+              <AnimatePresence>
+                <motion.span
+                  key={selectedReaction} // this triggers remount on change
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: [1.4, 1], opacity: 1 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="inline-block"
+                >
+                  {selectedReaction}
+                </motion.span>
+              </AnimatePresence>
+            ) : (
+              <ThumbsUpIcon size={28} />
+            )}
           </button>
-          {isHovering && (
-            <div
-              className="absolute bottom-[-5] mb-2 right-50 bg-transparent p-10 rounded-lg flex gap-2 z-50 cursor-pointer"
-              onMouseEnter={() => setIsHovering(true)}
-              onMouseLeave={() => setIsHovering(false)}
-            >
-              <div className="flex bg-card rounded-lg shadow-md">
+
+          <AnimatePresence>
+            {isHovering && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.2 }}
+                className="flex p-1 absolute bottom-6 mb-2 right-[20vw] z-50 cursor-pointer bg-card rounded-lg shadow-md"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              >
                 {reactions.map((emoji) => (
                   <button
                     key={emoji}
@@ -54,9 +87,9 @@ export default function PostCard({ post }: PostCardProps) {
                     {emoji}
                   </button>
                 ))}
-              </div>
-            </div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     )
