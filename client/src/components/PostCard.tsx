@@ -1,25 +1,50 @@
 "use client";
 
 import { Post } from "@/types/post";
+import { ReactionType } from "@/types/enums";
 import { useState, useRef } from "react";
 import { ThumbsUpIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { createReaction } from "@/lib/reactions/createReaction";
 
 interface PostCardProps {
   post: Post | null;
 }
 
-const reactions = ["👍", "❤️", "😂", "😮", "😢", "😡"];
+// Mapping ReactionType to their corresponding emojis
+const reactionsMap: Record<ReactionType, string> = {
+  [ReactionType.LIKE]: "👍",
+  [ReactionType.LOVE]: "❤️",
+  [ReactionType.HAHA]: "😂",
+  [ReactionType.WOW]: "😮",
+  [ReactionType.SAD]: "😢",
+  [ReactionType.ANGRY]: "😡",
+};
 
 export default function PostCard({ post }: PostCardProps) {
   const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
   const [isHovering, setIsHovering] = useState(false);
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleReaction = (reaction: string) => {
+  const handleReaction = async (reaction: string) => {
     setSelectedReaction(reaction);
     setIsHovering(false);
     clearTimeout(hideTimeoutRef.current!);
+
+    if (!post?.id) {
+      console.error("Post ID is undefined");
+      return;
+    }
+    try {
+      const reactionData = await createReaction({
+        postId: post?.id,
+        type: reaction as ReactionType,
+      });
+
+      console.log("Reaction created:", reactionData);
+    } catch (error) {
+      console.error("Error creating reaction:", error);
+    }
   };
 
   const handleMouseEnter = () => {
@@ -59,7 +84,7 @@ export default function PostCard({ post }: PostCardProps) {
                   transition={{ duration: 0.3, ease: "easeOut" }}
                   className="inline-block"
                 >
-                  {selectedReaction}
+                  {reactionsMap[selectedReaction as ReactionType]}
                 </motion.span>
               </AnimatePresence>
             ) : (
@@ -78,10 +103,10 @@ export default function PostCard({ post }: PostCardProps) {
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
               >
-                {reactions.map((emoji) => (
+                {Object.entries(reactionsMap).map(([type, emoji]) => (
                   <button
-                    key={emoji}
-                    onClick={() => handleReaction(emoji)}
+                    key={type}
+                    onClick={() => handleReaction(type as ReactionType)}
                     className="text-3xl hover:scale-110 transition-transform cursor-pointer"
                   >
                     {emoji}

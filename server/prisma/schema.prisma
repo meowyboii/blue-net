@@ -74,7 +74,7 @@ model Reaction {
 
   createdAt DateTime @default(now())
 
-  @@unique([userId, postId, type])
+  @@unique([userId, postId])
 }
 
 model Follow {
