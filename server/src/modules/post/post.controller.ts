@@ -23,10 +23,10 @@ export class PostController {
     @Body() postData: CreatePostDto,
     @Req() req: Request,
   ): Promise<PostModel> {
-    const user = req.user as { userId: string };
+    const user = req.user as { id: string };
     return this.postService.createPost({
       ...postData,
-      authorId: user.userId,
+      authorId: user.id,
     });
   }
   @UseGuards(AuthGuard('jwt'))

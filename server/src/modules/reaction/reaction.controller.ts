@@ -1,4 +1,12 @@
-import { Controller, Post, Body, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Req,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
 import { ReactionService } from './reaction.service';
 import { Reaction as ReactionModel } from '@prisma/client';
 import { CreateReactionDto } from './dto/create-reaction.dto';
@@ -14,10 +22,15 @@ export class ReactionController {
     @Body() reactionData: CreateReactionDto,
     @Req() req: Request,
   ): Promise<ReactionModel> {
-    const user = req.user as { userId: string };
+    const user = req.user as { id: string };
     return this.reactionService.createReaction({
       ...reactionData,
-      userId: user.userId,
+      userId: user.id,
     });
+  }
+  @UseGuards(AuthGuard('jwt'))
+  @Get('counts/:postId')
+  async getReactionCounts(@Param('postId') postId: string) {
+    return this.reactionService.getReactionCounts(postId);
   }
 }

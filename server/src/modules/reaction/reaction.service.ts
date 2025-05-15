@@ -31,6 +31,8 @@ export class ReactionService {
     });
   }
 
+  // Create a reaction
+  // If the reaction already exists, update it
   async createReaction(data: {
     userId: string;
     postId: string;
@@ -58,15 +60,21 @@ export class ReactionService {
       },
     });
   }
-  async updateReaction(params: {
-    where: Prisma.ReactionWhereUniqueInput;
-    data: Prisma.ReactionUpdateInput;
-  }): Promise<Reaction> {
-    const { where, data } = params;
-    return this.prisma.reaction.update({
-      data,
-      where,
+  // Get the count of reactions for a specific post
+  async getReactionCounts(postId: string) {
+    const reactions = await this.prisma.reaction.groupBy({
+      by: ['type'],
+      where: { postId },
+      _count: {
+        type: true,
+      },
     });
+
+    // Map the response to a more readable format
+    return reactions.map((reaction) => ({
+      type: reaction.type,
+      count: reaction._count.type,
+    }));
   }
 
   async deleteReaction(

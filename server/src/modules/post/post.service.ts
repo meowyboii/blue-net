@@ -41,6 +41,12 @@ export class PostService {
             createdAt: true,
           },
         },
+        reactions: {
+          select: {
+            type: true,
+            userId: true,
+          },
+        },
       },
     });
   }
