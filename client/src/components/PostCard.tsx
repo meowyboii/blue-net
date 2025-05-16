@@ -3,7 +3,7 @@
 import { Post } from "@/types/post";
 import { ReactionCount } from "@/types/reaction";
 import { ReactionType } from "@/types/enums";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { ThumbsUpIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createReaction } from "@/lib/reactions/createReaction";
@@ -32,43 +32,50 @@ export default function PostCard({ post }: PostCardProps) {
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { user } = useAuth();
 
-  useEffect(() => {
-    const fetchReactions = async () => {
-      try {
-        const reactions = await getReactions(post?.id || "");
-        // Calculate total reactions count
-        const total = reactions.reduce(
-          (acc: number, reaction: ReactionCount) => acc + reaction.count,
-          0
-        );
-        setTotalCount(total);
+  // Fetch Reactions Logic
+  const fetchReactions = useCallback(async () => {
+    if (!post?.id) return;
 
-        // Sort by Count (Descending Order) and get the top 3
-        const sortedReactions = [...reactions]
-          .sort((a: ReactionCount, b: ReactionCount) => b.count - a.count)
-          .slice(0, 3);
+    try {
+      const reactions = await getReactions(post.id);
 
-        setTopReactions(sortedReactions);
-      } catch (error) {
-        console.error("Error fetching reactions:", error);
-      }
-    };
-    fetchReactions();
+      // Calculate total reactions count
+      const total = reactions.reduce(
+        (acc: number, reaction: ReactionCount) => acc + reaction.count,
+        0
+      );
+      setTotalCount(total);
+
+      // Sort by Count (Descending Order) and get the top 3
+      const sortedReactions = [...reactions]
+        .sort((a: ReactionCount, b: ReactionCount) => b.count - a.count)
+        .slice(0, 3);
+
+      setTopReactions(sortedReactions);
+    } catch (error) {
+      console.error("Error fetching reactions:", error);
+    }
   }, [post?.id]);
 
+  // Call it on component mount & when selectedReaction changes
+  useEffect(() => {
+    fetchReactions();
+  }, [fetchReactions, selectedReaction]);
+
+  // Check if the user already reacted
   useEffect(() => {
     if (post?.reactions && user?.id) {
       const reactionType = post.reactions.find(
         (reaction) => reaction.userId === user.id
       )?.type;
-      console.log("User reaction type:", reactionType);
-      // Set the selected reaction if it exists
+
       if (reactionType) {
         setSelectedReaction(reactionType);
       }
     }
   }, [post?.reactions, user?.id]);
 
+  // Handle Reaction Logic
   const handleReaction = async (reaction: string) => {
     setSelectedReaction(reaction);
     setIsHovering(false);
@@ -79,12 +86,13 @@ export default function PostCard({ post }: PostCardProps) {
       return;
     }
     try {
-      const reactionData = await createReaction({
-        postId: post?.id,
+      await createReaction({
+        postId: post.id,
         type: reaction as ReactionType,
       });
 
-      console.log("Reaction created:", reactionData);
+      // Fetch the updated reactions
+      await fetchReactions();
     } catch (error) {
       console.error("Error creating reaction:", error);
     }
