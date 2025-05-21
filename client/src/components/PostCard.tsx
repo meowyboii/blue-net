@@ -1,15 +1,46 @@
-// src/components/PostCard.tsx (or your path)
 "use client";
 
-import { Reaction } from "@/types/reaction";
+import { useCallback, useEffect, useState } from "react";
 import { Post } from "@/types/post";
-import Reactions from "./Reactions"; // Adjust path to your new Reactions component
+import PostActions from "./PostActions";
+import ReactionsCount from "./ReactionsCount";
+import { ReactionCount } from "@/types/reaction";
+import { getReactions } from "@/lib/reactions/getReactions";
 
 interface PostCardProps {
   post: Post | null;
 }
 
 export default function PostCard({ post }: PostCardProps) {
+  const [topReactions, setTopReactions] = useState<ReactionCount[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
+
+  const fetchReactions = useCallback(async () => {
+    if (!post?.id) return;
+
+    try {
+      const reactionsData = await getReactions(post?.id);
+
+      const total = reactionsData.reduce(
+        (acc: number, reaction: ReactionCount) => acc + reaction.count,
+        0
+      );
+      setTotalCount(total);
+
+      const sortedReactions = [...reactionsData]
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 3);
+
+      setTopReactions(sortedReactions);
+    } catch (error) {
+      console.error("Error fetching reactions:", error);
+    }
+  }, [post?.id]);
+
+  useEffect(() => {
+    fetchReactions();
+  }, [fetchReactions]);
+
   if (!post) {
     return null; // loading state
   }
@@ -33,11 +64,9 @@ export default function PostCard({ post }: PostCardProps) {
       </div>
       <p className="text-lg whitespace-pre-wrap">{post.content}</p>
 
-      <div className="mt-4 pt-4 border-t border-border">
-        <Reactions
-          postId={post.id}
-          initialUserReactions={post.reactions as Reaction[]}
-        />
+      <div>
+        <ReactionsCount topReactions={topReactions} totalCount={totalCount} />
+        <PostActions post={post} fetchReactions={fetchReactions} />
       </div>
     </div>
   );
