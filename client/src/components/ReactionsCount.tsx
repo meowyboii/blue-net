@@ -3,7 +3,7 @@ import { ReactionType } from "@/types/enums";
 import { ReactionCount } from "@/types/reaction";
 
 interface ReactionCountProps {
-  topReactions: ReactionCount[];
+  topReactions?: ReactionCount[];
   totalCount: number;
 }
 
@@ -13,7 +13,7 @@ export default function ReactionsCount({
 }: ReactionCountProps) {
   return (
     <div className="flex items-center space-x-1 mb-2">
-      {topReactions.map((reaction) => (
+      {topReactions?.map((reaction) => (
         <div
           key={reaction.type}
           className="flex items-center gap-1 py-1 text-xl"

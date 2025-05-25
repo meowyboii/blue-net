@@ -3,15 +3,21 @@ import { MessageSquare, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import { Reaction } from "@/types/reaction";
+import { ReactionCount } from "@/types/reaction";
 import { Post } from "@/types/post";
+import PostDialog from "./PostDialog";
 
 interface PostActionsProps {
   post: Post | null;
+  topReactions: ReactionCount[];
+  totalCount: number;
   fetchReactions: () => Promise<void>;
 }
 
 export default function PostActions({
   post,
+  topReactions,
+  totalCount,
   fetchReactions,
 }: PostActionsProps) {
   if (!post) {
@@ -24,13 +30,22 @@ export default function PostActions({
         initialUserReactions={post.reactions as Reaction[]}
         fetchReactions={fetchReactions}
       />
-      <Button
-        variant="ghost"
-        className="flex-1 flex items-center justify-center gap-2 text-gray-400 "
-      >
-        <MessageSquare className="h-5 w-5" />
-        <span>Comment</span>
-      </Button>
+      <PostDialog
+        post={post}
+        topReactions={topReactions}
+        totalCount={totalCount}
+        trigger={
+          <Button
+            variant="ghost"
+            className="flex-1 flex items-center justify-center gap-2 text-gray-400 "
+          >
+            <MessageSquare className="h-5 w-5" />
+            <span>Comment</span>
+          </Button>
+        }
+        fetchReactions={fetchReactions}
+      />
+
       <Button
         variant="ghost"
         className="flex-1 flex items-center justify-center gap-2 text-gray-400 "

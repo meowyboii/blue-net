@@ -66,7 +66,12 @@ export default function PostCard({ post }: PostCardProps) {
 
       <div>
         <ReactionsCount topReactions={topReactions} totalCount={totalCount} />
-        <PostActions post={post} fetchReactions={fetchReactions} />
+        <PostActions
+          post={post}
+          topReactions={topReactions}
+          totalCount={totalCount}
+          fetchReactions={fetchReactions}
+        />
       </div>
     </div>
   );
