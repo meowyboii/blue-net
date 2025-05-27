@@ -25,12 +25,16 @@ import { cn } from "@/lib/utils";
 import { Post } from "@/types/post";
 import ReactionsCount from "./ReactionsCount";
 import { ReactionCount } from "@/types/reaction";
-import PostActions from "./PostActions";
+import CommentActions from "./CommentActions";
+import { ReactionType } from "@/types/enums";
 
 interface PostDialogProps {
   post: Post | null;
   topReactions: ReactionCount[];
   totalCount: number;
+  selectedReaction: ReactionType | null;
+  setSelectedReaction: (reaction: ReactionType | null) => void;
+  checkInitialReaction: () => Promise<void>;
   fetchReactions: () => Promise<void>;
   trigger?: React.ReactNode;
 }
@@ -39,6 +43,9 @@ export default function PostDialog({
   post,
   topReactions,
   totalCount,
+  selectedReaction,
+  setSelectedReaction = () => {},
+  checkInitialReaction = async () => {},
   fetchReactions,
   trigger,
 }: PostDialogProps) {
@@ -95,10 +102,13 @@ export default function PostDialog({
         <div className="px-4 py-2">
           <p className="text-white whitespace-pre-line mb-5">{post.content}</p>
           <ReactionsCount topReactions={topReactions} totalCount={totalCount} />
-          <PostActions
+          <CommentActions
             post={post}
             topReactions={topReactions}
             totalCount={totalCount}
+            selectedReaction={selectedReaction}
+            setSelectedReaction={setSelectedReaction}
+            checkInitialReaction={checkInitialReaction}
             fetchReactions={fetchReactions}
           />
         </div>

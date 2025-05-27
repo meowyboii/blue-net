@@ -2,7 +2,6 @@
 "use client";
 
 import { ReactionType } from "@/types/enums";
-import { Reaction } from "@/types/reaction";
 import { useState, useRef, useEffect } from "react";
 import { ThumbsUpIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,35 +12,28 @@ import { reactionsMap } from "@/constants/reactions";
 
 interface ReactionsProps {
   postId: string;
-  initialUserReactions?: Reaction[]; // To check for existing user reaction
+  selectedReaction: ReactionType | null;
+  setSelectedReaction: (reaction: ReactionType | null) => void;
+  checkInitialReaction: () => Promise<void>;
   fetchReactions: () => Promise<void>;
 }
 
 export default function ReactionsButton({
   postId,
-  initialUserReactions,
+  selectedReaction,
+  setSelectedReaction = () => {},
+  checkInitialReaction = async () => {},
   fetchReactions,
 }: ReactionsProps) {
   const [isHovering, setIsHovering] = useState(false);
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { user } = useAuth();
-  const [selectedReaction, setSelectedReaction] = useState<string | null>(null);
 
-  // Check if the user already reacted based on initial data
   useEffect(() => {
-    if (initialUserReactions && user?.id) {
-      const userReaction = initialUserReactions.find(
-        (reaction) => reaction.userId === user.id
-      );
-      if (userReaction) {
-        setSelectedReaction(userReaction.type);
-      } else {
-        setSelectedReaction(null); // Explicitly set to null if no reaction found
-      }
-    } else {
-      setSelectedReaction(null); // Reset if user or initial reactions change
+    if (postId && user?.id) {
+      checkInitialReaction();
     }
-  }, [initialUserReactions, setSelectedReaction, user?.id]);
+  }, [checkInitialReaction, postId, user?.id, setSelectedReaction]);
 
   // Handle Reaction Logic
   const handleReaction = async (reactionType: ReactionType) => {
@@ -66,6 +58,7 @@ export default function ReactionsButton({
 
       // Fetch the updated reactions to get new counts and potentially new top reactions
       await fetchReactions();
+      await checkInitialReaction(); // Re-check the user's reaction after creating
     } catch (error) {
       console.error("Error creating reaction:", error);
       setSelectedReaction(previousReaction); // Revert optimistic update on error

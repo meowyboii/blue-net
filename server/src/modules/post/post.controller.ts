@@ -6,6 +6,8 @@ import {
   Req,
   Get,
   Query,
+  Param,
+  NotFoundException,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { Post as PostModel } from '@prisma/client';
@@ -41,5 +43,16 @@ export class PostController {
       take: take ? Number(take) : undefined,
     });
     return posts;
+  }
+  @UseGuards(AuthGuard('jwt'))
+  @Get(':id')
+  async getPost(@Param('id') id: string): Promise<PostModel | null> {
+    const post = await this.postService.post({ id });
+
+    if (!post) {
+      throw new NotFoundException(`Post with id "${id}" not found`);
+    }
+
+    return post;
   }
 }

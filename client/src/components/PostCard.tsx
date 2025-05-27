@@ -4,8 +4,11 @@ import { useCallback, useEffect, useState } from "react";
 import { Post } from "@/types/post";
 import PostActions from "./PostActions";
 import ReactionsCount from "./ReactionsCount";
-import { ReactionCount } from "@/types/reaction";
+import { Reaction, ReactionCount } from "@/types/reaction";
 import { getReactions } from "@/lib/reactions/getReactions";
+import { useAuth } from "@/context/AuthContext";
+import { getPost } from "@/lib/posts/getPost";
+import { ReactionType } from "@/types/enums";
 
 interface PostCardProps {
   post: Post | null;
@@ -14,6 +17,10 @@ interface PostCardProps {
 export default function PostCard({ post }: PostCardProps) {
   const [topReactions, setTopReactions] = useState<ReactionCount[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
+  const [selectedReaction, setSelectedReaction] = useState<ReactionType | null>(
+    null
+  );
+  const { user } = useAuth();
 
   const fetchReactions = useCallback(async () => {
     if (!post?.id) return;
@@ -40,6 +47,24 @@ export default function PostCard({ post }: PostCardProps) {
   useEffect(() => {
     fetchReactions();
   }, [fetchReactions]);
+
+  // Check if the user already reacted based on initial data
+  const checkInitialReaction = useCallback(async () => {
+    try {
+      if (!post?.id || !user?.id) return;
+      const postData = await getPost(post.id);
+      if (postData.reactions && user?.id) {
+        const userReaction = postData.reactions.find(
+          (reaction: Reaction) => reaction.userId === user.id
+        );
+        setSelectedReaction(userReaction?.type ?? null);
+      } else {
+        setSelectedReaction(null);
+      }
+    } catch (error) {
+      console.error("Error fetching post for initial reaction check:", error);
+    }
+  }, [post, setSelectedReaction, user?.id]);
 
   if (!post) {
     return null; // loading state
@@ -70,6 +95,9 @@ export default function PostCard({ post }: PostCardProps) {
           post={post}
           topReactions={topReactions}
           totalCount={totalCount}
+          selectedReaction={selectedReaction}
+          setSelectedReaction={setSelectedReaction}
+          checkInitialReaction={checkInitialReaction}
           fetchReactions={fetchReactions}
         />
       </div>

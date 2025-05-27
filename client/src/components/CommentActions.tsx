@@ -5,9 +5,8 @@ import { Button } from "@/components/ui/button";
 import { ReactionCount } from "@/types/reaction";
 import { ReactionType } from "@/types/enums";
 import { Post } from "@/types/post";
-import PostDialog from "./PostDialog";
 
-interface PostActionsProps {
+interface CommentActionsProps {
   post: Post;
   topReactions: ReactionCount[];
   totalCount: number;
@@ -17,15 +16,13 @@ interface PostActionsProps {
   fetchReactions: () => Promise<void>;
 }
 
-export default function PostActions({
+export default function CommentActions({
   post,
-  topReactions,
-  totalCount,
   selectedReaction,
   setSelectedReaction = () => {},
   checkInitialReaction = async () => {},
   fetchReactions,
-}: PostActionsProps) {
+}: CommentActionsProps) {
   if (!post) {
     return null;
   }
@@ -38,24 +35,13 @@ export default function PostActions({
         checkInitialReaction={checkInitialReaction}
         fetchReactions={fetchReactions}
       />
-      <PostDialog
-        post={post}
-        topReactions={topReactions}
-        totalCount={totalCount}
-        selectedReaction={selectedReaction}
-        setSelectedReaction={setSelectedReaction}
-        checkInitialReaction={checkInitialReaction}
-        fetchReactions={fetchReactions}
-        trigger={
-          <Button
-            variant="ghost"
-            className="flex-1 flex items-center justify-center gap-2 text-gray-400 "
-          >
-            <MessageSquare className="h-5 w-5" />
-            <span>Comment</span>
-          </Button>
-        }
-      />
+      <Button
+        variant="ghost"
+        className="flex-1 flex items-center justify-center gap-2 text-gray-400 "
+      >
+        <MessageSquare className="h-5 w-5" />
+        <span>Comment</span>
+      </Button>
 
       <Button
         variant="ghost"
