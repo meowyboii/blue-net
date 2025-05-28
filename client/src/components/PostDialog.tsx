@@ -3,15 +3,7 @@
 import type React from "react";
 
 import { useState } from "react";
-import Image from "next/image";
-import {
-  MoreHorizontal,
-  Send,
-  Smile,
-  ImageIcon,
-  Gift,
-  FileType,
-} from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,12 +13,12 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
 import { Post } from "@/types/post";
 import ReactionsCount from "./ReactionsCount";
 import { ReactionCount } from "@/types/reaction";
 import CommentActions from "./CommentActions";
 import { ReactionType } from "@/types/enums";
+import { CommentSection } from "./CommentSection";
 
 interface PostDialogProps {
   post: Post | null;
@@ -49,7 +41,6 @@ export default function PostDialog({
   fetchReactions,
   trigger,
 }: PostDialogProps) {
-  const [commentText, setCommentText] = useState("");
   const [open, setOpen] = useState(false);
 
   if (!post) {
@@ -170,53 +161,7 @@ export default function PostDialog({
             ))}
           </div>
         )} */}
-
-        {/* Comment input */}
-        <div className="p-4 flex items-center gap-2">
-          <div className="h-8 w-8 rounded-full overflow-hidden flex-shrink-0">
-            <Image
-              src="/placeholder.svg?height=32&width=32"
-              alt="Your avatar"
-              width={32}
-              height={32}
-              className="object-cover"
-            />
-          </div>
-          <div className="flex-1 flex items-center bg-[#3a3a4c] rounded-full px-3 py-1">
-            <input
-              type="text"
-              placeholder="Write a comment..."
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              className="flex-1 bg-transparent text-white text-sm outline-none"
-            />
-            <div className="flex items-center gap-2 text-gray-400">
-              <button className="p-1 hover:text-gray-300">
-                <Smile className="h-5 w-5" />
-              </button>
-              <button className="p-1 hover:text-gray-300">
-                <ImageIcon className="h-5 w-5" />
-              </button>
-              <button className="p-1 hover:text-gray-300">
-                <Gift className="h-5 w-5" />
-              </button>
-              <button className="p-1 hover:text-gray-300">
-                <FileType className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-          <button
-            className={cn(
-              "p-1 text-gray-400",
-              commentText.trim()
-                ? "text-[#3b82f6] hover:text-[#2563eb] cursor-pointer"
-                : "opacity-50 cursor-not-allowed"
-            )}
-            disabled={!commentText.trim()}
-          >
-            <Send className="h-5 w-5" />
-          </button>
-        </div>
+        <CommentSection postId={post.id} />
       </DialogContent>
     </Dialog>
   );

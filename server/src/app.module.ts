@@ -8,6 +8,7 @@ import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { PostModule } from './modules/post/post.module';
 import { ReactionModule } from './modules/reaction/reaction.module';
+import { CommentModule } from './modules/comment/comment.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ReactionModule } from './modules/reaction/reaction.module';
     UserModule,
     PostModule,
     ReactionModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
