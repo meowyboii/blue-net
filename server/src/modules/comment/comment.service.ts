@@ -31,6 +31,35 @@ export class CommentService {
     });
   }
 
+  async getCommentsByPostId(params: {
+    skip?: number;
+    take?: number;
+    where?: Prisma.CommentWhereInput;
+    orderBy?: Prisma.CommentOrderByWithRelationInput;
+  }): Promise<Comment[]> {
+    const { skip = 0, take = 5, where, orderBy } = params;
+    return this.prisma.comment.findMany({
+      where,
+      skip,
+      take,
+      orderBy,
+      include: {
+        author: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            displayName: true,
+            bio: true,
+            avatarUrl: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+  }
+
   async createComment(
     data: Prisma.CommentUncheckedCreateInput,
   ): Promise<Comment> {

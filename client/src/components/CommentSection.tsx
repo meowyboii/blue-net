@@ -2,11 +2,13 @@ import { commentSchema } from "@/schemas/comment";
 import { CommentData } from "@/schemas/comment";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import Image from "next/image";
 import { Send, Smile, ImageIcon, Gift, FileType } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { createComment } from "@/lib/comments/createComment";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import React from "react";
+import { getComments } from "@/lib/comments/getComments";
 
 interface CommentSectionProps {
   postId: string;
@@ -14,6 +16,7 @@ interface CommentSectionProps {
 
 export const CommentSection = ({ postId }: CommentSectionProps) => {
   const [loading, setLoading] = useState<boolean>(false);
+
   const {
     register,
     watch,
@@ -23,6 +26,7 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
   } = useForm<CommentData>({
     resolver: zodResolver(commentSchema),
   });
+  const queryClient = useQueryClient();
   const content = watch("content");
 
   const submitComment = async (commentData: CommentData) => {
@@ -31,6 +35,8 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
       const comment = await createComment(commentData, postId);
       console.log("Comment created:", comment);
       reset();
+      // Refetch comments after submitting
+      await queryClient.invalidateQueries({ queryKey: ["comments", postId] });
     } catch (error) {
       console.error("Error creating comment:", error);
     } finally {
@@ -38,60 +44,122 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
     }
   };
 
-  if (loading) {
-    return <p className="text-gray-500">Submitting comment...</p>;
-  }
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+    error,
+  } = useInfiniteQuery({
+    queryKey: ["comments", postId],
+    queryFn: async ({ pageParam = 0 }) => {
+      // pageParam is the `skip`
+      try {
+        const res = await getComments(postId, pageParam as number, 5);
+        return res;
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+        throw error;
+      }
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.length < 5) return undefined;
+      return allPages.flat().length;
+    },
+    initialPageParam: 0,
+  });
+
   return (
-    <form
-      onSubmit={handleSubmit(submitComment)}
-      className="p-4 flex items-center gap-2"
-    >
-      <div className="h-8 w-8 rounded-full overflow-hidden flex-shrink-0">
-        <Image
-          src="/placeholder.svg?height=32&width=32"
-          alt="Your avatar"
-          width={32}
-          height={32}
-          className="object-cover"
-        />
-      </div>
-      <div className="flex-1 flex items-center bg-[#3a3a4c] rounded-full px-3 py-1">
-        <input
-          type="text"
-          placeholder="Write a comment..."
-          className="flex-1 bg-transparent text-white text-sm outline-none"
-          {...register("content")}
-        />
-        {errors.content && (
-          <p className="text-sm text-red-500">{errors.content.message}</p>
-        )}
-        <div className="flex items-center gap-2 text-gray-400">
-          <button className="p-1 hover:text-gray-300">
-            <Smile className="h-5 w-5" />
-          </button>
-          <button className="p-1 hover:text-gray-300">
-            <ImageIcon className="h-5 w-5" />
-          </button>
-          <button className="p-1 hover:text-gray-300">
-            <Gift className="h-5 w-5" />
-          </button>
-          <button className="p-1 hover:text-gray-300">
-            <FileType className="h-5 w-5" />
-          </button>
-        </div>
-      </div>
-      <button
-        className={cn(
-          "p-1 text-gray-400",
-          content?.trim()
-            ? "text-[#3b82f6] hover:text-[#2563eb] cursor-pointer"
-            : "opacity-50 cursor-not-allowed"
-        )}
-        disabled={!content?.trim()}
-        type="submit"
+    <>
+      <form
+        onSubmit={handleSubmit(submitComment)}
+        className="p-4 flex items-center gap-2"
       >
-        <Send className="h-5 w-5" />
-      </button>
-    </form>
+        <span className="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center text-foreground"></span>
+        <div className="flex-1 flex items-center bg-[#3a3a4c] rounded-full px-3 py-1">
+          <input
+            type="text"
+            placeholder="Write a comment..."
+            className="flex-1 bg-transparent text-white text-sm outline-none"
+            {...register("content")}
+          />
+          {errors.content && (
+            <p className="text-sm text-red-500">{errors.content.message}</p>
+          )}
+          <div className="flex items-center gap-2 text-gray-400">
+            <button className="p-1 hover:text-gray-300" type="button">
+              <Smile className="h-5 w-5" />
+            </button>
+            <button className="p-1 hover:text-gray-300" type="button">
+              <ImageIcon className="h-5 w-5" />
+            </button>
+            <button className="p-1 hover:text-gray-300" type="button">
+              <Gift className="h-5 w-5" />
+            </button>
+            <button className="p-1 hover:text-gray-300" type="button">
+              <FileType className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+        <button
+          className={cn(
+            "p-1 text-gray-400",
+            content?.trim()
+              ? "text-[#3b82f6] hover:text-[#2563eb] cursor-pointer"
+              : "opacity-50 cursor-not-allowed"
+          )}
+          disabled={!content?.trim() && !loading} // Disable if no content or loading
+          type="submit"
+        >
+          <Send className="h-5 w-5" />
+        </button>
+      </form>
+
+      <div className="p-4">
+        {data?.pages.flat().map((comment) => (
+          <div key={comment.id} className="flex gap-2">
+            <div className="relative flex-shrink-0">
+              <span className="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center text-foreground">
+                {comment.author.firstName?.charAt(0)}
+                {comment.author.lastName?.charAt(0)}
+              </span>
+            </div>
+            <div className="flex-1 mb-4">
+              <div className="bg-[#3a3a4c] rounded-2xl px-3 py-2">
+                <p className="font-medium text-white text-sm">
+                  {comment.author.firstName}
+                </p>
+                <p className="text-white text-sm">{comment.content}</p>
+              </div>
+              <div className="flex items-center gap-2 mt-1 text-xs text-gray-400">
+                <span>{comment.time}</span>
+                <button className="font-medium hover:underline">Like</button>
+                <button className="font-medium hover:underline">Reply</button>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {isError && (
+          <p className="text-sm text-red-500">
+            Error: {(error as Error).message}
+          </p>
+        )}
+
+        {(isFetchingNextPage || isLoading) && (
+          <p className="text-foreground/50 text-sm">Loading comments...</p>
+        )}
+        {hasNextPage && !isFetchingNextPage && (
+          <button
+            onClick={() => fetchNextPage()}
+            className="text-foreground/50 text-sm hover:underline cursor-pointer "
+          >
+            Load More Comments
+          </button>
+        )}
+      </div>
+    </>
   );
 };
