@@ -19,6 +19,7 @@ import { useForm } from "react-hook-form";
 import { createPost } from "@/lib/posts/createPost";
 import React from "react";
 import PostFeed from "@/components/PostFeed";
+import FollowSection from "@/components/FollowSection";
 
 export default function Home() {
   const [loading, setLoading] = React.useState(false);
@@ -54,9 +55,9 @@ export default function Home() {
       <h1 className="text-3xl font-bold mb-4">
         Welcome to Blue Net {user?.email}
       </h1>
-      <main className="w-full grid grid-cols-[1fr_2fr_1fr] gap-10">
+      <main className="w-full grid grid-cols-[1fr_2fr_1fr] gap-15 px-4">
         <div></div>
-        <div className="py-4 px-[6vw]">
+        <div className="py-4 px-[5vw]">
           <div className="flex justify-between items-center mb-10">
             <h2 className="text-2xl font-semibold">Feed</h2>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -93,7 +94,9 @@ export default function Home() {
           </div>
           <PostFeed />
         </div>
-        <div></div>
+        <div>
+          <FollowSection />
+        </div>
       </main>
     </div>
   );

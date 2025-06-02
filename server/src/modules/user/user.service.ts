@@ -31,6 +31,34 @@ export class UserService {
     });
   }
 
+  async getUsersNotFollowedBy(currentUserId: string) {
+    const followedIds = await this.prisma.follow.findMany({
+      where: { followerId: currentUserId },
+      select: { followingId: true },
+    });
+
+    const followedIdList = followedIds.map((f) => f.followingId);
+
+    return this.prisma.user.findMany({
+      where: {
+        id: {
+          notIn: [currentUserId, ...followedIdList], // Exclude self and followed users
+        },
+      },
+      take: 10, // Limit the number of users returned
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        displayName: true,
+        bio: true,
+        avatarUrl: true,
+        createdAt: true,
+      },
+    });
+  }
+
   async createUser(data: Prisma.UserCreateInput): Promise<User> {
     return this.prisma.user.create({
       data,
