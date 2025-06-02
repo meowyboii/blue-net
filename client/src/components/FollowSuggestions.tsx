@@ -2,6 +2,7 @@ import { UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { UserProfile } from "@/types/user";
 import { getSuggestions } from "@/lib/users/getSuggestions";
+import { followUser } from "@/lib/follows/followUser";
 export default function FollowSuggestions() {
   const [suggestions, setSuggestions] = useState<UserProfile[]>([]);
   useEffect(() => {
@@ -9,13 +10,23 @@ export default function FollowSuggestions() {
       try {
         const suggestionsData = await getSuggestions();
         setSuggestions(suggestionsData);
-        console.log("Suggestions fetched:", suggestions);
       } catch (error) {
         console.error("Error fetching suggestions:", error);
       }
     };
     fetchSuggestions();
-  }, [suggestions]);
+  }, []);
+
+  const handleFollow = async (userId: string) => {
+    try {
+      const followData = await followUser(userId);
+      console.log("User followed:", followData);
+      // Update the suggestions state to remove the followed user
+      setSuggestions((prev) => prev.filter((user) => user.id !== userId));
+    } catch (error) {
+      console.error("Error following user:", error);
+    }
+  };
 
   return (
     <>
@@ -40,6 +51,7 @@ export default function FollowSuggestions() {
                 <UserPlus
                   size={25}
                   className="text-foreground/60 hover:text-blue-400 transition-colors cursor-pointer"
+                  onClick={() => handleFollow(user.id)}
                 />
               </li>
             ))}
