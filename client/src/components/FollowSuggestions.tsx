@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { UserProfile } from "@/types/user";
 import { getSuggestions } from "@/lib/users/getSuggestions";
 import { followUser } from "@/lib/follows/followUser";
+import Link from "next/link";
 export default function FollowSuggestions() {
   const [suggestions, setSuggestions] = useState<UserProfile[]>([]);
   useEffect(() => {
@@ -56,9 +57,11 @@ export default function FollowSuggestions() {
               </li>
             ))}
           </ul>
-          <button className="mt-4 w-full text-sm text-blue-400 hover:underline cursor-pointer">
-            View All
-          </button>
+          <Link href="/connections">
+            <button className="mt-4 w-full text-sm text-blue-400 hover:underline cursor-pointer">
+              View All
+            </button>
+          </Link>
         </div>
       )}
     </>

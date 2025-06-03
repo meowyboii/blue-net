@@ -6,28 +6,47 @@ import { Follow, Prisma } from '@prisma/client';
 export class FollowService {
   constructor(private prisma: PrismaService) {}
 
-  async follow(
-    followWhereUniqueInput: Prisma.FollowWhereUniqueInput,
-  ): Promise<Follow | null> {
-    return this.prisma.follow.findUnique({
+  async getFollowers(
+    followWhereUniqueInput: Prisma.FollowWhereInput,
+  ): Promise<Follow[]> {
+    return this.prisma.follow.findMany({
       where: followWhereUniqueInput,
+      include: {
+        follower: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            displayName: true,
+            avatarUrl: true,
+            bio: true,
+            createdAt: true,
+          },
+        },
+      },
     });
   }
 
-  async follows(params: {
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.FollowWhereUniqueInput;
-    where?: Prisma.FollowWhereInput;
-    orderBy?: Prisma.FollowOrderByWithRelationInput;
-  }): Promise<Follow[]> {
-    const { skip, take, cursor, where, orderBy } = params;
+  async getFollowing(
+    followWhereUniqueInput: Prisma.FollowWhereInput,
+  ): Promise<Follow[]> {
     return this.prisma.follow.findMany({
-      skip,
-      take,
-      cursor,
-      where,
-      orderBy,
+      where: followWhereUniqueInput,
+      include: {
+        following: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            displayName: true,
+            avatarUrl: true,
+            bio: true,
+            createdAt: true,
+          },
+        },
+      },
     });
   }
 
