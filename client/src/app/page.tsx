@@ -2,7 +2,6 @@
 
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/context/AuthContext";
 import {
   Dialog,
   DialogContent,
@@ -20,11 +19,11 @@ import { createPost } from "@/lib/posts/createPost";
 import React from "react";
 import PostFeed from "@/components/PostFeed";
 import FollowSection from "@/components/FollowSection";
+import MenuSection from "@/components/MenuSection";
 
 export default function Home() {
   const [loading, setLoading] = React.useState(false);
   const [dialogOpen, setDialogOpen] = React.useState(false);
-  const { user } = useAuth();
   const {
     register,
     handleSubmit,
@@ -52,11 +51,8 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center min-h-screen">
       <Navbar />
-      <h1 className="text-3xl font-bold mb-4">
-        Welcome to Blue Net {user?.email}
-      </h1>
-      <main className="w-full grid grid-cols-[1fr_2fr_1fr] gap-15 px-4">
-        <div></div>
+      <main className="w-full grid grid-cols-[1fr_2fr_1fr] gap-15">
+        <MenuSection />
         <div className="py-4 px-[5vw]">
           <div className="flex justify-between items-center mb-10">
             <h2 className="text-2xl font-semibold">Feed</h2>
@@ -94,9 +90,8 @@ export default function Home() {
           </div>
           <PostFeed />
         </div>
-        <div>
-          <FollowSection />
-        </div>
+
+        <FollowSection />
       </main>
     </div>
   );
