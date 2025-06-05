@@ -10,6 +10,7 @@ import { getFollowers } from "@/lib/follows/getFollowers";
 import { getFollowing } from "@/lib/follows/getFollowing";
 import { followUser } from "@/lib/follows/followUser";
 import { FollowWithFollower, FollowWithFollowing } from "@/types/follow";
+import Image from "next/image";
 
 export default function UserTabs() {
   const [suggestions, setSuggestions] = useState<UserProfile[]>([]);
@@ -55,10 +56,13 @@ export default function UserTabs() {
       className="flex items-center justify-between py-3 border-b border-muted"
     >
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center text-sm font-bold text-primary">
-          {user.firstName?.charAt(0)}
-          {user.lastName?.charAt(0)}
-        </div>
+        <Image
+          src={user.avatarUrl}
+          alt="profile picture"
+          className="rounded-full bg-foreground/10"
+          width={50}
+          height={50}
+        />
         <div>
           <p className="text-sm font-semibold">
             {user.firstName} {user.lastName}
@@ -88,7 +92,7 @@ export default function UserTabs() {
   if (error) return <div className="text-red-500">{error}</div>;
 
   return (
-    <div className="max-w-lg w-full mx-auto mt-6 p-4">
+    <div className="max-w-xl w-full mx-auto mt-6 p-4">
       <Tabs defaultValue="suggestions" className="w-full">
         <TabsList className="grid w-full grid-cols-3 bg-transparent ">
           <TabsTrigger

@@ -9,6 +9,7 @@ import { getReactions } from "@/lib/reactions/getReactions";
 import { useAuth } from "@/context/AuthContext";
 import { getPost } from "@/lib/posts/getPost";
 import { ReactionType } from "@/types/enums";
+import Image from "next/image";
 
 interface PostCardProps {
   post: Post | null;
@@ -74,10 +75,13 @@ export default function PostCard({ post }: PostCardProps) {
     <div className="space-y-6 bg-card p-8 rounded-xl relative">
       <div className="flex items-center space-x-4">
         {/* Placeholder for author avatar, replace with actual image if available */}
-        <span className="w-12 h-12 rounded-full bg-foreground/10 flex items-center justify-center text-foreground">
-          {post.author.firstName?.charAt(0)}
-          {post.author.lastName?.charAt(0)}
-        </span>
+        <Image
+          src={post.author.avatarUrl}
+          alt="profile picture"
+          className="rounded-full bg-foreground/10"
+          width={50}
+          height={50}
+        />
         <div>
           <h3 className="text-lg font-semibold">
             {post.author.firstName} {post.author.lastName}

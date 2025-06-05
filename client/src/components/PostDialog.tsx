@@ -19,6 +19,7 @@ import { ReactionCount } from "@/types/reaction";
 import CommentActions from "./CommentActions";
 import { ReactionType } from "@/types/enums";
 import { CommentSection } from "./CommentSection";
+import Image from "next/image";
 
 interface PostDialogProps {
   post: Post | null;
@@ -66,13 +67,13 @@ export default function PostDialog({
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <span className="w-12 h-12 rounded-full bg-foreground/10 flex items-center justify-center text-foreground">
-                {post.author.firstName?.charAt(0)}
-                {post.author.lastName?.charAt(0)}
-              </span>
-              {/* {user.isOnline && (
-                <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-[#242436]"></div>
-              )} */}
+              <Image
+                src={post.author.avatarUrl}
+                alt="profile picture"
+                className="rounded-full bg-foreground/10"
+                width={50}
+                height={50}
+              />
             </div>
             <div>
               <p className="font-medium text-white">

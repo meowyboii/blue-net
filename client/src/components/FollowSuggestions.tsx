@@ -6,6 +6,8 @@ import { UserProfile } from "@/types/user";
 import { getSuggestions } from "@/lib/users/getSuggestions";
 import { followUser } from "@/lib/follows/followUser";
 import Link from "next/link";
+import Image from "next/image";
+
 export default function FollowSuggestions() {
   const [suggestions, setSuggestions] = useState<UserProfile[]>([]);
   useEffect(() => {
@@ -40,10 +42,13 @@ export default function FollowSuggestions() {
             {suggestions.map((user, index) => (
               <li key={index} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="w-12 h-12 rounded-full bg-foreground/10 flex items-center justify-center text-foreground">
-                    {user.firstName?.charAt(0)}
-                    {user.lastName?.charAt(0)}
-                  </span>
+                  <Image
+                    src={user.avatarUrl}
+                    alt="profile picture"
+                    className="rounded-full bg-foreground/10"
+                    width={50}
+                    height={50}
+                  />
                   <div>
                     <p className="text-sm font-medium">
                       {user.firstName} {user.lastName}

@@ -30,7 +30,7 @@ model User {
   lastName    String
   displayName String?
   bio         String?
-  avatarUrl   String?
+  avatarUrl   String  @default("https://guybzvdcsaxytioccpmf.supabase.co/storage/v1/object/public/blue-net//new_user_avatar.jpg")
 
   posts     Post[]     @relation("UserPosts")
   comments  Comment[]

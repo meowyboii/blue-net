@@ -9,6 +9,7 @@ import { createComment } from "@/lib/comments/createComment";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { getComments } from "@/lib/comments/getComments";
+import Image from "next/image";
 
 interface CommentSectionProps {
   postId: string;
@@ -120,12 +121,13 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
       <div className="p-4">
         {data?.pages.flat().map((comment) => (
           <div key={comment.id} className="flex gap-2">
-            <div className="relative flex-shrink-0">
-              <span className="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center text-foreground">
-                {comment.author.firstName?.charAt(0)}
-                {comment.author.lastName?.charAt(0)}
-              </span>
-            </div>
+            <Image
+              src={comment.author.avatarUrl}
+              alt="profile picture"
+              className="rounded-full bg-foreground/10"
+              width={50}
+              height={50}
+            />
             <div className="flex-1 mb-4">
               <div className="bg-[#3a3a4c] rounded-2xl px-3 py-2">
                 <p className="font-medium text-white text-sm">
