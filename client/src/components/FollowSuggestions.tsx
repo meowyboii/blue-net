@@ -1,3 +1,5 @@
+"use client";
+
 import { UserPlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { UserProfile } from "@/types/user";

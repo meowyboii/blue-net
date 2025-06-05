@@ -71,6 +71,43 @@ export class PostService {
     });
   }
 
+  async getUserPosts(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.PostWhereUniqueInput;
+    where?: Prisma.PostWhereInput;
+    orderBy?: Prisma.PostOrderByWithRelationInput;
+  }): Promise<Post[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.post.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      orderBy,
+      include: {
+        author: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            displayName: true,
+            bio: true,
+            avatarUrl: true,
+            createdAt: true,
+          },
+        },
+        reactions: {
+          select: {
+            type: true,
+            userId: true,
+          },
+        },
+      },
+    });
+  }
+
   async createPost(data: {
     authorId: string;
     content: string;

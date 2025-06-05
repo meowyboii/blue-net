@@ -14,12 +14,14 @@ import { Post as PostModel } from '@prisma/client';
 import { CreatePostDto } from './dto/create-post.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
+import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { UserPayload } from 'src/@types/user-payload';
 
 @Controller('post')
+@UseGuards(AuthGuard('jwt'))
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
-  @UseGuards(AuthGuard('jwt'))
   @Post('create')
   async createPost(
     @Body() postData: CreatePostDto,
@@ -31,7 +33,7 @@ export class PostController {
       authorId: user.id,
     });
   }
-  @UseGuards(AuthGuard('jwt'))
+
   @Get()
   async getPosts(
     @Query('skip') skip: number,
@@ -44,7 +46,22 @@ export class PostController {
     });
     return posts;
   }
-  @UseGuards(AuthGuard('jwt'))
+
+  @Get('me')
+  async getUserPosts(
+    @CurrentUser() user: UserPayload,
+    @Query('skip') skip: number,
+    @Query('take') take: number,
+  ): Promise<PostModel[]> {
+    const posts = await this.postService.posts({
+      where: { authorId: user.id },
+      orderBy: { createdAt: 'desc' },
+      skip: skip ? Number(skip) : undefined,
+      take: take ? Number(take) : undefined,
+    });
+    return posts;
+  }
+
   @Get(':id')
   async getPost(@Param('id') id: string): Promise<PostModel | null> {
     const post = await this.postService.post({ id });
