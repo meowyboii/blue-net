@@ -14,15 +14,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { createPost } from "@/lib/posts/createPost";
 import { useState } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { QueryKey, useInfiniteQuery } from "@tanstack/react-query";
 import { Post } from "@/types/post";
 
 interface PostSectionProps {
   title: string;
+  queryKey: QueryKey;
   getPosts: (params: { skip?: number; take?: number }) => Promise<Post[]>;
 }
 
-export default function PostSection({ title, getPosts }: PostSectionProps) {
+export default function PostSection({
+  title,
+  queryKey,
+  getPosts,
+}: PostSectionProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const {
@@ -51,7 +56,7 @@ export default function PostSection({ title, getPosts }: PostSectionProps) {
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery({
-      queryKey: ["posts"],
+      queryKey: queryKey,
       queryFn: async ({ pageParam = 0 }) => {
         // pageParam is the `skip`
         try {

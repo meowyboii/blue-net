@@ -12,7 +12,11 @@ export default function Home() {
       <Navbar />
       <main className="w-full grid grid-cols-[1fr_2fr_1fr] gap-15">
         <MenuSection />
-        <PostSection getPosts={getPosts} title="Feed" />
+        <PostSection
+          title="Feed"
+          queryKey={["posts", "all"]}
+          getPosts={getPosts}
+        />
         <FollowSection />
       </main>
     </div>
