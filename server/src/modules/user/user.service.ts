@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { User, Prisma } from '@prisma/client';
+import { UserWithCounts } from '../auth/interfaces/user.interface';
 
 @Injectable()
 export class UserService {
@@ -8,10 +9,19 @@ export class UserService {
 
   async user(
     userWhereUniqueInput: Prisma.UserWhereUniqueInput,
-  ): Promise<User | null> {
-    return this.prisma.user.findUnique({
+  ): Promise<UserWithCounts | null> {
+    const user = await this.prisma.user.findUnique({
       where: userWhereUniqueInput,
     });
+    if (!user) return null;
+    const followersCount = await this.prisma.follow.count({
+      where: { followingId: user?.id },
+    });
+
+    const followingCount = await this.prisma.follow.count({
+      where: { followerId: user?.id },
+    });
+    return { ...user, followersCount, followingCount };
   }
 
   async users(params: {

@@ -9,17 +9,12 @@ import {
 } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-
-interface User {
-  id: string;
-  email: string;
-  name?: string;
-}
+import { UserProfile } from "@/types/user";
 
 interface AuthContextProps {
-  user: User | null;
+  user: UserProfile | null;
   loading: boolean;
-  setUser: (user: User | null) => void;
+  setUser: (user: UserProfile | null) => void;
   login: (
     email: string,
     password: string
@@ -30,7 +25,7 @@ interface AuthContextProps {
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 

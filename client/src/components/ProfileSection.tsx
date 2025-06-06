@@ -15,11 +15,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { updateUserProfile } from "@/lib/users/updateUser";
 import Image from "next/image";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ProfileSection() {
   const [loading, setLoading] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [preview, setPreview] = useState<string | null>("");
+  const { user } = useAuth();
   const {
     register,
     handleSubmit,
@@ -64,9 +66,9 @@ export default function ProfileSection() {
   const submitProfile = async (userProfileData: userProfileData) => {
     setLoading(true);
     try {
-      const user = await updateUserProfile(userProfileData);
+      const userData = await updateUserProfile(userProfileData);
 
-      console.log("User profile updated:", user);
+      console.log("User profile updated:", userData);
       setDialogOpen(false);
       reset();
     } catch (error) {
@@ -76,14 +78,19 @@ export default function ProfileSection() {
     }
   };
 
+  if (!user) return null;
   return (
     <div className="mx-auto py-4 px-[5vw]">
       {/* Top section */}
       <div className="flex justify-between items-center">
         {/* Profile image */}
-        <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-black">
-          <span className="w-12 h-12 rounded-full bg-foreground/10 flex items-center justify-center text-foreground"></span>
-        </div>
+        <Image
+          src={user.avatarUrl}
+          alt="Profile picture"
+          className="rounded-full cursor-pointer"
+          width={100}
+          height={100}
+        />
 
         {/* Edit profile dialog*/}
         <div>
@@ -107,20 +114,25 @@ export default function ProfileSection() {
                   </DialogTitle>
                 </DialogHeader>
                 {/* Profile picture*/}
-                <label
-                  htmlFor="image-upload"
-                  className="relative w-50 h-50 rounded-full bg-foreground/10 flex items-center justify-center text-foreground mb-4 overflow-hidden cursor-pointer"
-                >
+                <label htmlFor="image-upload" className="mb-5">
                   {preview ? (
                     <Image
                       src={preview}
                       alt="Uploaded image"
-                      className="object-cover w-full h-full"
-                      width={96}
-                      height={96}
+                      className="rounded-full cursor-pointer"
+                      width={150}
+                      height={150}
                     />
                   ) : (
-                    <span className="text-sm text-center">Upload</span>
+                    user && (
+                      <Image
+                        src={user.avatarUrl}
+                        alt="Profile picture"
+                        className="rounded-full cursor-pointer"
+                        width={150}
+                        height={150}
+                      />
+                    )
                   )}
                   <Input
                     id="image-upload"
@@ -165,22 +177,24 @@ export default function ProfileSection() {
 
       {/* Name and handle */}
       <div className="mt-4">
-        <h1 className="text-xl font-bold text-white">jazz for cows</h1>
-        <p className="text-gray-400">@f_midel</p>
+        <h1 className="text-xl font-bold text-white">
+          {user.firstName} {user.lastName}
+        </h1>
+        <p className="text-gray-400">{user.email}</p>
       </div>
 
       {/* Joined info */}
       <div className="mt-2 text-gray-400 text-sm">
-        <p>Joined July 2021</p>
+        <p>Joined {new Date(user.createdAt).toLocaleDateString()}</p>
       </div>
 
       {/* Follower and Following */}
       <div className="mt-2 flex gap-4 pb-5 text-sm text-white border-b border-foreground/15">
         <span>
-          <strong>78</strong> Following
+          <strong>{user.followingCount}</strong> Following
         </span>
         <span>
-          <strong>51</strong> Followers
+          <strong>{user.followersCount}</strong> Followers
         </span>
       </div>
     </div>

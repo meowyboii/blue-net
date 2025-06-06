@@ -7,4 +7,6 @@ export interface UserProfile {
   bio?: string;
   avatarUrl: string;
   createdAt: string;
+  followersCount: number;
+  followingCount: number;
 }

@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { House, LogOut, Settings, Users } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import Image from "next/image";
 
 export default function MenuSection() {
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   return (
     <section className="p-4 w-full max-w-sm font-semibold">
       <ul className="space-y-1">
@@ -49,7 +50,15 @@ export default function MenuSection() {
         href="/profile"
         className="hover:bg-foreground/10 p-2 rounded-md flex items-center gap-3 mt-5"
       >
-        <span className="w-12 h-12 rounded-full bg-foreground/10 flex items-center justify-center text-foreground"></span>
+        {user && (
+          <Image
+            src={user.avatarUrl}
+            alt="profile picture"
+            className="rounded-full bg-foreground/10"
+            width={50}
+            height={50}
+          />
+        )}
         Profile
       </Link>
     </section>

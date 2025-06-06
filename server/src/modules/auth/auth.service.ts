@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { UserService } from '../user/user.service';
 import { User as UserModel } from '@prisma/client';
+import { UserWithCounts } from './interfaces/user.interface';
 
 @Injectable()
 export class AuthService {
@@ -35,7 +36,7 @@ export class AuthService {
   }
   // Validate user credentials
   // This method checks if the user exists and if the password is correct
-  async validateUser(email: string, password: string): Promise<UserModel> {
+  async validateUser(email: string, password: string): Promise<UserWithCounts> {
     const user = await this.userService.user({ email });
     if (!user) {
       throw new NotFoundException('User not found');
@@ -49,8 +50,18 @@ export class AuthService {
 
   // Login user
   // This method generates a JWT token for the user after successful login
-  async login(user: UserModel): Promise<{ access_token: string }> {
-    const payload = { email: user.email, sub: user.id };
+  async login(user: UserWithCounts): Promise<{ access_token: string }> {
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      bio: user.bio,
+      avatarUrl: user.avatarUrl,
+      createdAt: user.createdAt,
+      followersCount: user.followersCount,
+      followingCount: user.followingCount,
+    };
     return {
       access_token: await this.jwtService.signAsync(payload),
     };

@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, StrategyOptions } from 'passport-jwt';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 import { Request } from 'express';
+import { UserPayload } from 'src/@types/user-payload';
 
 const cookieExtractor = (req: Request): string | null => {
   const token = (req.cookies as { token?: string })?.token;
@@ -19,7 +20,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super(options);
   }
 
-  validate(payload: JwtPayload) {
-    return { id: payload.sub, email: payload.email };
+  validate(payload: JwtPayload): UserPayload {
+    return {
+      id: payload.sub,
+      email: payload.email,
+      firstName: payload.firstName,
+      lastName: payload.lastName,
+      bio: payload.bio,
+      avatarUrl: payload.avatarUrl,
+      createdAt: payload.createdAt,
+      followersCount: payload.followersCount,
+      followingCount: payload.followingCount,
+    };
   }
 }
