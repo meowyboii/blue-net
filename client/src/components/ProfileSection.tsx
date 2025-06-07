@@ -14,8 +14,8 @@ import { userProfileData, userProfileSchema } from "@/schemas/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { updateUserProfile } from "@/lib/users/updateUser";
-import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
+import Avatar from "./ui/avatar";
 
 export default function ProfileSection() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -87,13 +87,7 @@ export default function ProfileSection() {
       {/* Top section */}
       <div className="flex justify-between items-center">
         {/* Profile image */}
-        <Image
-          src={user.avatarUrl}
-          alt="Profile picture"
-          className="rounded-full cursor-pointer"
-          width={100}
-          height={100}
-        />
+        <Avatar src={user.avatarUrl} alt="Profile picture" size={100} />
 
         {/* Edit profile dialog*/}
         <div>
@@ -117,25 +111,14 @@ export default function ProfileSection() {
                   </DialogTitle>
                 </DialogHeader>
                 {/* Profile picture*/}
-                <label
-                  htmlFor="image-upload"
-                  className="mb-5 w-[150px] h-[150px] rounded-full overflow-hidden"
-                >
+                <label htmlFor="image-upload" className="mb-5 cursor-pointer">
                   {preview ? (
-                    <Image
-                      src={preview}
-                      alt="Uploaded image"
-                      className="object-cover w-full h-full cursor-pointer"
-                      width={100}
-                      height={100}
-                    />
+                    <Avatar src={preview} alt="Uploaded image" size={150} />
                   ) : (
-                    <Image
+                    <Avatar
                       src={user.avatarUrl}
                       alt="Profile picture"
-                      className="object-cover w-full h-full cursor-pointer"
-                      width={100}
-                      height={100}
+                      size={150}
                     />
                   )}
                   <Input
@@ -155,6 +138,7 @@ export default function ProfileSection() {
                   id="displayName"
                   {...register("displayName")}
                   placeholder="Display Name"
+                  value={user.displayName}
                 />
                 {errors.displayName && (
                   <p className="text-sm text-red-500 mt-2">
@@ -165,6 +149,7 @@ export default function ProfileSection() {
                   placeholder="Bio"
                   className="resize-none h-35 my-4"
                   {...register("bio")}
+                  value={user.bio}
                 />
                 {errors.bio && (
                   <p className="text-sm text-red-500 mt-2">
@@ -187,11 +172,11 @@ export default function ProfileSection() {
         <h1 className="text-xl font-bold text-white">
           {user.firstName} {user.lastName}
         </h1>
-        <p className="text-gray-400">{user.email}</p>
+        <p className="text-foreground/60 mt-2">{user.bio}</p>
       </div>
 
       {/* Joined info */}
-      <div className="mt-2 text-gray-400 text-sm">
+      <div className="mt-2 text-foreground/50 text-sm">
         <p>Joined {new Date(user.createdAt).toLocaleDateString()}</p>
       </div>
 

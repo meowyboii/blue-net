@@ -10,7 +10,7 @@ import { getFollowers } from "@/lib/follows/getFollowers";
 import { getFollowing } from "@/lib/follows/getFollowing";
 import { followUser } from "@/lib/follows/followUser";
 import { FollowWithFollower, FollowWithFollowing } from "@/types/follow";
-import Image from "next/image";
+import Avatar from "@/components/ui/avatar";
 
 export default function UserTabs() {
   const [suggestions, setSuggestions] = useState<UserProfile[]>([]);
@@ -56,12 +56,10 @@ export default function UserTabs() {
       className="flex items-center justify-between py-3 border-b border-muted"
     >
       <div className="flex items-center gap-3">
-        <Image
+        <Avatar
           src={user.avatarUrl}
-          alt="profile picture"
-          className="rounded-full bg-foreground/10"
-          width={50}
-          height={50}
+          alt={`${user.firstName}'s avatar`}
+          size={50}
         />
         <div>
           <p className="text-sm font-semibold">

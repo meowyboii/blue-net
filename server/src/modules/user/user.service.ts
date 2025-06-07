@@ -19,9 +19,11 @@ export class UserService {
 
   async user(
     userWhereUniqueInput: Prisma.UserWhereUniqueInput,
+    select?: Prisma.UserSelect,
   ): Promise<UserWithCounts | null> {
     const user = await this.prisma.user.findUnique({
       where: userWhereUniqueInput,
+      select,
     });
     if (!user) return null;
     const followersCount = await this.prisma.follow.count({

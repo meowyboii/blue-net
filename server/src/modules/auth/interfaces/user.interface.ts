@@ -13,3 +13,8 @@ export interface UserProfile {
   avatarUrl: string;
   createdAt: Date;
 }
+
+export interface UserProfileWithCounts extends UserProfile {
+  followersCount: number;
+  followingCount: number;
+}

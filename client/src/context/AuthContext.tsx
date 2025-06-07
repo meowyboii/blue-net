@@ -10,6 +10,7 @@ import {
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { UserProfile } from "@/types/user";
+import { getUserProfile } from "@/lib/users/getUserProfile";
 
 interface AuthContextProps {
   user: UserProfile | null;
@@ -29,20 +30,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  const fetchUserProfile = async () => {
+    try {
+      const userProfile = await getUserProfile();
+      setUser(userProfile);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   // Auto-load user when app starts
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const { data } = await axios.get("/api/me");
-        setUser(data);
-      } catch (error) {
-        console.log("Failed to fetch user:", error);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUser();
+    fetchUserProfile();
   }, []);
 
   const logout = async () => {
@@ -59,8 +59,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (response.status === 200) {
-        const { data } = await axios.get("/api/me");
-        setUser(data);
+        const userProfile = await getUserProfile();
+        setUser(userProfile);
         return { success: true };
       }
       return { success: false, message: "Unexpected response from server." };

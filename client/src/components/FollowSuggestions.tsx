@@ -6,7 +6,7 @@ import { UserProfile } from "@/types/user";
 import { getSuggestions } from "@/lib/users/getSuggestions";
 import { followUser } from "@/lib/follows/followUser";
 import Link from "next/link";
-import Image from "next/image";
+import Avatar from "./ui/avatar";
 
 export default function FollowSuggestions() {
   const [suggestions, setSuggestions] = useState<UserProfile[]>([]);
@@ -42,12 +42,10 @@ export default function FollowSuggestions() {
             {suggestions.map((user, index) => (
               <li key={index} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Image
+                  <Avatar
                     src={user.avatarUrl}
                     alt="profile picture"
-                    className="rounded-full bg-foreground/10"
-                    width={50}
-                    height={50}
+                    size={50}
                   />
                   <div>
                     <p className="text-sm font-medium">
