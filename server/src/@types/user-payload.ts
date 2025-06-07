@@ -3,7 +3,8 @@ export interface UserPayload {
   email: string;
   firstName: string;
   lastName: string;
-  bio: string;
+  displayName: string | null;
+  bio: string | null;
   avatarUrl: string;
   createdAt: Date;
   followersCount: number;

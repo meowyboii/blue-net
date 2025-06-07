@@ -1,10 +1,4 @@
-import {
-  IsOptional,
-  IsString,
-  IsUrl,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class UpdateUserDto {
   @IsString()
@@ -16,8 +10,4 @@ export class UpdateUserDto {
   @IsString()
   @MaxLength(160, { message: 'Bio must not exceed 160 characters' })
   bio?: string;
-
-  @IsOptional()
-  @IsUrl({}, { message: 'Avatar URL must be a valid URL' })
-  avatarUrl?: string;
 }

@@ -21,12 +21,11 @@ export default function ProfileSection() {
   const [loading, setLoading] = useState<boolean>(false);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [preview, setPreview] = useState<string | null>("");
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
     watch,
     setValue,
   } = useForm<userProfileData>({
@@ -59,6 +58,8 @@ export default function ProfileSection() {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
+      const file = event.target.files[0];
+      if (!file.type.startsWith("image/")) return;
       setValue("avatar", event.target.files[0]);
     }
   };
@@ -66,11 +67,13 @@ export default function ProfileSection() {
   const submitProfile = async (userProfileData: userProfileData) => {
     setLoading(true);
     try {
-      const userData = await updateUserProfile(userProfileData);
+      const updatedUser = await updateUserProfile(userProfileData);
+      // Append a cache-busting query parameter to prevent the use of previous cached image
+      updatedUser.avatarUrl = `${updatedUser.avatarUrl}?t=${updatedUser.updatedAt}`;
 
-      console.log("User profile updated:", userData);
+      console.log("User profile updated:", updatedUser);
+      setUser(updatedUser);
       setDialogOpen(false);
-      reset();
     } catch (error) {
       console.error("Error updating user profile:", error);
     } finally {
@@ -114,35 +117,37 @@ export default function ProfileSection() {
                   </DialogTitle>
                 </DialogHeader>
                 {/* Profile picture*/}
-                <label htmlFor="image-upload" className="mb-5">
+                <label
+                  htmlFor="image-upload"
+                  className="mb-5 w-[150px] h-[150px] rounded-full overflow-hidden"
+                >
                   {preview ? (
                     <Image
                       src={preview}
                       alt="Uploaded image"
-                      className="rounded-full cursor-pointer"
-                      width={150}
-                      height={150}
+                      className="object-cover w-full h-full cursor-pointer"
+                      width={100}
+                      height={100}
                     />
                   ) : (
-                    user && (
-                      <Image
-                        src={user.avatarUrl}
-                        alt="Profile picture"
-                        className="rounded-full cursor-pointer"
-                        width={150}
-                        height={150}
-                      />
-                    )
+                    <Image
+                      src={user.avatarUrl}
+                      alt="Profile picture"
+                      className="object-cover w-full h-full cursor-pointer"
+                      width={100}
+                      height={100}
+                    />
                   )}
                   <Input
                     id="image-upload"
                     onChange={handleFileChange}
                     type="file"
+                    accept="image/*"
                     className="absolute inset-0 opacity-0"
                   />
                 </label>
                 {errors.avatar && (
-                  <p className="text-sm text-red-500">
+                  <p className="text-sm text-red-500 mt-2">
                     {errors.avatar.message}
                   </p>
                 )}
@@ -152,7 +157,7 @@ export default function ProfileSection() {
                   placeholder="Display Name"
                 />
                 {errors.displayName && (
-                  <p className="text-sm text-red-500">
+                  <p className="text-sm text-red-500 mt-2">
                     {errors.displayName.message}
                   </p>
                 )}
@@ -162,7 +167,9 @@ export default function ProfileSection() {
                   {...register("bio")}
                 />
                 {errors.bio && (
-                  <p className="text-sm text-red-500">{errors.bio.message}</p>
+                  <p className="text-sm text-red-500 mt-2">
+                    {errors.bio.message}
+                  </p>
                 )}
                 <DialogFooter className="w-full">
                   <Button type="submit" className="w-full" disabled={loading}>

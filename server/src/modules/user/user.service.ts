@@ -1,11 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
+import { SupabaseService } from '../supabase/supabase.service';
 import { User, Prisma } from '@prisma/client';
 import { UserWithCounts } from '../auth/interfaces/user.interface';
+import { Express } from 'express';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private supabase: SupabaseService,
+  ) {}
+  private readonly logger = new Logger(UserService.name);
 
   async user(
     userWhereUniqueInput: Prisma.UserWhereUniqueInput,
@@ -75,14 +85,44 @@ export class UserService {
     });
   }
 
+  async uploadAvatar(
+    file: Express.Multer.File,
+    userId: string,
+  ): Promise<string | undefined> {
+    const supabase = this.supabase.getClient();
+    try {
+      const { error } = await supabase.storage
+        .from('blue-net')
+        .upload(`avatars/${userId}`, file.buffer, {
+          contentType: file.mimetype,
+          upsert: true, // allows overwriting
+        });
+
+      if (error) {
+        throw new InternalServerErrorException('Failed to upload file', error);
+      }
+
+      const { data: publicData } = supabase.storage
+        .from('blue-net')
+        .getPublicUrl(`avatars/${userId}`);
+      this.logger.log(`Avatar uploaded successfully: ${publicData.publicUrl}`);
+      // Append a cache-busting query parameter to prevent the use of previous image in frontend
+      return `${publicData.publicUrl}?t=${Date.now()}`;
+    } catch (error) {
+      this.logger.error('Avatar upload failed', error);
+    }
+  }
+
   async updateUser(params: {
     where: Prisma.UserWhereUniqueInput;
     data: Prisma.UserUpdateInput;
+    select: Prisma.UserSelect;
   }): Promise<User> {
-    const { where, data } = params;
+    const { where, data, select } = params;
     return this.prisma.user.update({
       data,
       where,
+      select,
     });
   }
 

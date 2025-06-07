@@ -3,6 +3,7 @@ export interface JwtPayload {
   email: string;
   firstName: string;
   lastName: string;
+  displayName: string;
   bio: string;
   avatarUrl: string;
   createdAt: Date;

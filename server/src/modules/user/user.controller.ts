@@ -1,10 +1,22 @@
-import { Controller, UseGuards, Get, Patch, Body } from '@nestjs/common';
+import {
+  Controller,
+  UseGuards,
+  Get,
+  Patch,
+  Body,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { UserPayload } from 'src/@types/user-payload';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User as UserModel } from '@prisma/client';
+
+import { FileInterceptor } from '@nestjs/platform-express/multer';
+import * as multer from 'multer';
+import { Express } from 'express';
+import { UserProfile } from '../auth/interfaces/user.interface';
 
 @Controller('user')
 @UseGuards(AuthGuard('jwt'))
@@ -16,14 +28,37 @@ export class UserController {
     return await this.userService.getUsersNotFollowedBy(user.id);
   }
   @Patch('profile')
+  @UseInterceptors(
+    FileInterceptor('avatar', { storage: multer.memoryStorage() }),
+  )
   async updateUserProfile(
     @CurrentUser() user: UserPayload,
     @Body() userProfileData: UpdateUserDto,
-  ): Promise<UserModel> {
+    @UploadedFile() file?: Express.Multer.File,
+  ): Promise<UserProfile> {
+    const avatarUrl = file
+      ? await this.userService.uploadAvatar(file, user.id)
+      : undefined;
+    console.log(avatarUrl);
     const updatedUser = await this.userService.updateUser({
       where: { id: user.id },
-      data: userProfileData,
+      data: {
+        displayName: userProfileData.displayName,
+        bio: userProfileData.bio,
+        ...(avatarUrl && { avatarUrl }), // Only include avatarUrl if it exists
+      },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        displayName: true,
+        bio: true,
+        avatarUrl: true,
+        createdAt: true,
+      },
     });
+
     return updatedUser;
   }
 }
