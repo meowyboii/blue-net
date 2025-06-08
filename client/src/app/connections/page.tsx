@@ -58,13 +58,11 @@ export default function UserTabs() {
       <div className="flex items-center gap-3">
         <Avatar
           src={user.avatarUrl}
-          alt={`${user.firstName}'s avatar`}
+          alt={`${user.displayName}'s avatar`}
           size={50}
         />
         <div>
-          <p className="text-sm font-semibold">
-            {user.firstName} {user.lastName}
-          </p>
+          <p className="text-sm font-semibold">{user.displayName}</p>
           <p className="text-xs text-muted-foreground">{user.email}</p>
         </div>
       </div>

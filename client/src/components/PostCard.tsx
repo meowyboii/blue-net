@@ -76,9 +76,7 @@ export default function PostCard({ post }: PostCardProps) {
       <div className="flex items-center space-x-4">
         <Avatar src={post.author.avatarUrl} alt="profile picture" size={50} />
         <div>
-          <h3 className="text-lg font-semibold">
-            {post.author.firstName} {post.author.lastName}
-          </h3>
+          <h3 className="text-lg font-semibold">{post.author.displayName}</h3>
           <p className="text-sm text-muted-foreground">
             {new Date(post.updatedAt).toLocaleDateString()}{" "}
           </p>

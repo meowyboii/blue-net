@@ -10,6 +10,7 @@ import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { getComments } from "@/lib/comments/getComments";
 import Avatar from "./ui/avatar";
+import { useAuth } from "@/context/AuthContext";
 
 interface CommentSectionProps {
   postId: string;
@@ -17,6 +18,7 @@ interface CommentSectionProps {
 
 export const CommentSection = ({ postId }: CommentSectionProps) => {
   const [loading, setLoading] = useState<boolean>(false);
+  const { user } = useAuth();
 
   const {
     register,
@@ -71,14 +73,14 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
     },
     initialPageParam: 0,
   });
-
+  if (!user) return null;
   return (
     <>
       <form
         onSubmit={handleSubmit(submitComment)}
         className="p-4 flex items-center gap-2"
       >
-        <span className="w-10 h-10 rounded-full bg-foreground/10 flex items-center justify-center text-foreground"></span>
+        <Avatar src={user.avatarUrl} alt="profile picture" size={40} />
         <div className="flex-1 flex items-center bg-[#3a3a4c] rounded-full px-3 py-1">
           <input
             type="text"
@@ -129,7 +131,7 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
             <div className="flex-1 mb-4">
               <div className="bg-[#3a3a4c] rounded-2xl px-3 py-2">
                 <p className="font-medium text-white text-sm">
-                  {comment.author.firstName}
+                  {comment.author.displayName}
                 </p>
                 <p className="text-white text-sm">{comment.content}</p>
               </div>

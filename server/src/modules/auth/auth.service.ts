@@ -25,13 +25,15 @@ export class AuthService {
     displayName?: string;
   }): Promise<UserModel> {
     const { email, password, firstName, lastName, displayName } = userData;
+    // If displayName is empty, default with first name + last name
+    const finalDisplayName = displayName || `${firstName} ${lastName}`;
     const hashedPassword = await bcrypt.hash(password, 10);
     return this.userService.createUser({
       email,
       password: hashedPassword,
       firstName,
       lastName,
-      displayName,
+      displayName: finalDisplayName,
     });
   }
   // Validate user credentials

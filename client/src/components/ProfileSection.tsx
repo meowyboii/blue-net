@@ -169,9 +169,7 @@ export default function ProfileSection() {
 
       {/* Name and handle */}
       <div className="mt-4">
-        <h1 className="text-xl font-bold text-white">
-          {user.firstName} {user.lastName}
-        </h1>
+        <h1 className="text-xl font-bold text-white">{user.displayName}</h1>
         <p className="text-foreground/60 mt-2">{user.bio}</p>
       </div>
 

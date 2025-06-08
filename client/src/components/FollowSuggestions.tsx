@@ -48,9 +48,7 @@ export default function FollowSuggestions() {
                     size={50}
                   />
                   <div>
-                    <p className="text-sm font-medium">
-                      {user.firstName} {user.lastName}
-                    </p>
+                    <p className="text-sm font-medium">{user.displayName}</p>
                     <p className="text-xs text-foreground/60">{user.email}</p>
                   </div>
                 </div>

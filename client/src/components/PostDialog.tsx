@@ -19,7 +19,7 @@ import { ReactionCount } from "@/types/reaction";
 import CommentActions from "./CommentActions";
 import { ReactionType } from "@/types/enums";
 import { CommentSection } from "./CommentSection";
-import Image from "next/image";
+import Avatar from "./ui/avatar";
 
 interface PostDialogProps {
   post: Post | null;
@@ -58,7 +58,7 @@ export default function PostDialog({
       >
         <DialogHeader className="p-4 border-b border-[#3a3a4c]">
           <DialogTitle className="text-lg font-semibold text-white">
-            {`${post.author.firstName}'s Post`}
+            {`${post.author.displayName}'s Post`}
           </DialogTitle>
           <DialogClose className="absolute right-4 top-4 text-gray-400 hover:text-white" />
         </DialogHeader>
@@ -67,17 +67,15 @@ export default function PostDialog({
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <Image
+              <Avatar
                 src={post.author.avatarUrl}
                 alt="profile picture"
-                className="rounded-full bg-foreground/10"
-                width={50}
-                height={50}
+                size={50}
               />
             </div>
             <div>
               <p className="font-medium text-white">
-                {post?.author.firstName} {post?.author.lastName}
+                {post?.author.displayName}
               </p>
               <div className="flex items-center text-xs text-gray-400">
                 <span>{new Date(post.updatedAt).toLocaleDateString()} </span>

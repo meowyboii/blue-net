@@ -10,7 +10,8 @@ export default function Avatar({
 }) {
   return (
     <div
-      className={`h-[${size}px] w-[${size}px] relative rounded-full overflow-hidden`}
+      style={{ width: size, height: size }}
+      className="relative rounded-full overflow-hidden"
     >
       <Image
         src={src}
