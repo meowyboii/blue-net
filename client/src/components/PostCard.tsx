@@ -10,6 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 import { getPost } from "@/lib/posts/getPost";
 import { ReactionType } from "@/types/enums";
 import Avatar from "./ui/avatar";
+import AudioPlayer from "./AudioPlayer";
 
 interface PostCardProps {
   post: Post | null;
@@ -82,6 +83,11 @@ export default function PostCard({ post }: PostCardProps) {
           </p>
         </div>
       </div>
+      <AudioPlayer
+        options={{
+          url: "/sample.mp3",
+        }}
+      />
       <p className="text-lg whitespace-pre-wrap">{post.content}</p>
 
       <div>
