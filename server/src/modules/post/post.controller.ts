@@ -3,19 +3,21 @@ import {
   Post,
   Body,
   UseGuards,
-  Req,
   Get,
   Query,
   Param,
   NotFoundException,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { Post as PostModel } from '@prisma/client';
 import { CreatePostDto } from './dto/create-post.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { UserPayload } from 'src/@types/user-payload';
+import * as multer from 'multer';
+import { FileInterceptor } from '@nestjs/platform-express/multer';
 
 @Controller('post')
 @UseGuards(AuthGuard('jwt'))
@@ -23,13 +25,20 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Post('create')
+  @UseInterceptors(
+    FileInterceptor('audio', { storage: multer.memoryStorage() }),
+  )
   async createPost(
     @Body() postData: CreatePostDto,
-    @Req() req: Request,
+    @CurrentUser() user: UserPayload,
+    @UploadedFile() file?: Express.Multer.File,
   ): Promise<PostModel> {
-    const user = req.user as { id: string };
+    const audioUrl = file
+      ? await this.postService.uploadAudio(file, user.id)
+      : undefined;
     return this.postService.createPost({
       ...postData,
+      audioUrl,
       authorId: user.id,
     });
   }

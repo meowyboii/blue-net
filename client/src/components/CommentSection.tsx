@@ -81,7 +81,7 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
         className="p-4 flex items-center gap-2"
       >
         <Avatar src={user.avatarUrl} alt="profile picture" size={40} />
-        <div className="flex-1 flex items-center bg-[#3a3a4c] rounded-full px-3 py-1">
+        <div className="flex-1 flex items-center bg-foreground/10 rounded-full px-3 py-1">
           <input
             type="text"
             placeholder="Write a comment..."
@@ -108,9 +108,9 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
         </div>
         <button
           className={cn(
-            "p-1 text-gray-400",
+            "p-1 text-foreground/40",
             content?.trim()
-              ? "text-[#3b82f6] hover:text-[#2563eb] cursor-pointer"
+              ? "text-primary/80 hover:text-primary cursor-pointer"
               : "opacity-50 cursor-not-allowed"
           )}
           disabled={!content?.trim() && !loading} // Disable if no content or loading
@@ -126,10 +126,10 @@ export const CommentSection = ({ postId }: CommentSectionProps) => {
             <Avatar
               src={comment.author.avatarUrl}
               alt="profile picture"
-              size={50}
+              size={40}
             />
             <div className="flex-1 mb-4">
-              <div className="bg-[#3a3a4c] rounded-2xl px-3 py-2">
+              <div className="bg-foreground/10 rounded-2xl px-3 py-2">
                 <p className="font-medium text-white text-sm">
                   {comment.author.displayName}
                 </p>

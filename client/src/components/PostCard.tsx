@@ -83,11 +83,8 @@ export default function PostCard({ post }: PostCardProps) {
           </p>
         </div>
       </div>
-      <AudioPlayer
-        options={{
-          url: "/sample.mp3",
-        }}
-      />
+      {post.audioUrl && <AudioPlayer audioUrl={post.audioUrl} />}
+
       <p className="text-lg whitespace-pre-wrap">{post.content}</p>
 
       <div>

@@ -20,6 +20,7 @@ import CommentActions from "./CommentActions";
 import { ReactionType } from "@/types/enums";
 import { CommentSection } from "./CommentSection";
 import Avatar from "./ui/avatar";
+import AudioPlayer from "./AudioPlayer";
 
 interface PostDialogProps {
   post: Post | null;
@@ -53,10 +54,10 @@ export default function PostDialog({
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
 
       <DialogContent
-        className="sm:max-w-xl bg-[#242436] border-[#3a3a4c] text-white p-0 gap-0 
+        className="sm:max-w-xl bg-card border-foreground/20 text-white p-0 gap-0 
              max-h-[90vh] overflow-y-auto"
       >
-        <DialogHeader className="p-4 border-b border-[#3a3a4c]">
+        <DialogHeader className="p-4 border-b border-foreground/20">
           <DialogTitle className="text-lg font-semibold text-white">
             {`${post.author.displayName}'s Post`}
           </DialogTitle>
@@ -85,7 +86,7 @@ export default function PostDialog({
           <Button
             variant="ghost"
             size="icon"
-            className="text-gray-400 hover:text-white"
+            className="text-foreground/50 hover:text-foreground"
           >
             <MoreHorizontal className="h-5 w-5" />
           </Button>
@@ -93,6 +94,7 @@ export default function PostDialog({
 
         {/* Post content */}
         <div className="px-4 py-2">
+          {post.audioUrl && <AudioPlayer audioUrl={post.audioUrl} />}
           <p className="text-white whitespace-pre-line mb-5">{post.content}</p>
           <ReactionsCount topReactions={topReactions} totalCount={totalCount} />
           <CommentActions

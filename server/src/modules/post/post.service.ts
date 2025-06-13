@@ -1,10 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Post, Prisma } from '@prisma/client';
+import { SupabaseService } from '../supabase/supabase.service';
 
 @Injectable()
 export class PostService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private supabase: SupabaseService,
+  ) {}
+
+  private readonly logger = new Logger(PostService.name);
 
   async post(
     postWhereUniqueInput: Prisma.PostWhereUniqueInput,
@@ -111,20 +121,56 @@ export class PostService {
   async createPost(data: {
     authorId: string;
     content: string;
-    imageUrl?: string;
+    audioUrl?: string;
   }): Promise<Post> {
-    const { authorId, content, imageUrl } = data;
+    const { authorId, content, audioUrl } = data;
 
     return this.prisma.post.create({
       data: {
         content,
-        imageUrl,
+        audioUrl,
+        ...(audioUrl && { audioUrl }), // Only include audioUrl if it exists
         author: {
           connect: { id: authorId },
         },
       },
     });
   }
+  async uploadAudio(
+    file: Express.Multer.File,
+    userId: string,
+  ): Promise<string | undefined> {
+    const supabase = this.supabase.getClient();
+    const timestamp = Date.now();
+    const extension = file.originalname.split('.').pop();
+    try {
+      const { error } = await supabase.storage
+        .from('blue-net')
+        .upload(
+          `posts/${userId}/audio/${timestamp}.${extension}`,
+          file.buffer,
+          {
+            contentType: file.mimetype,
+          },
+        );
+
+      if (error) {
+        throw new InternalServerErrorException('Failed to upload file', error);
+      }
+
+      const { data: publicData } = supabase.storage
+        .from('blue-net')
+        .getPublicUrl(`posts/${userId}/audio/${timestamp}.${extension}`);
+      if (!publicData) {
+        throw new InternalServerErrorException('Failed to get public URL');
+      }
+      this.logger.log(`Audio uploaded successfully: ${publicData.publicUrl}`);
+      return publicData.publicUrl;
+    } catch (error) {
+      this.logger.error('Audio upload failed', error);
+    }
+  }
+
   async updatePost(params: {
     where: Prisma.PostWhereUniqueInput;
     data: Prisma.PostUpdateInput;

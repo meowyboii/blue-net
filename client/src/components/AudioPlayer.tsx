@@ -9,12 +9,11 @@ import {
   Rewind,
   FastForward,
 } from "lucide-react";
-import { WaveSurferOptions } from "wavesurfer.js";
 import { useWavesurfer } from "@wavesurfer/react";
 
 // Define the props for the WaveSurfer component
 interface WaveSurferPlayerProps {
-  options: Omit<WaveSurferOptions, "container">;
+  audioUrl: string;
 }
 
 const formatTime = (seconds: number) => {
@@ -23,17 +22,17 @@ const formatTime = (seconds: number) => {
   return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
 };
 
-const AudioPlayer = ({ options }: WaveSurferPlayerProps) => {
+const AudioPlayer = ({ audioUrl }: WaveSurferPlayerProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(1);
+  const [volume, setVolume] = useState(0.5);
   const [isMuted, setIsMuted] = useState(false);
 
   const { wavesurfer } = useWavesurfer({
     container: containerRef,
-    ...options,
+    url: audioUrl,
     height: 80,
     waveColor: "rgb(200, 200, 200)",
     progressColor: "rgb(53, 114, 213)",
@@ -93,12 +92,10 @@ const AudioPlayer = ({ options }: WaveSurferPlayerProps) => {
       wavesurfer.on("audioprocess", (time) => setCurrentTime(time)),
       wavesurfer.on("ready", (newDuration) => setDuration(newDuration)),
     ];
-
     return () => {
       subscriptions.forEach((unsub) => unsub());
     };
   }, [wavesurfer]);
-
   return (
     <div className="rounded-lg p-4 w-full max-w-2xl mx-auto">
       <div
@@ -115,18 +112,21 @@ const AudioPlayer = ({ options }: WaveSurferPlayerProps) => {
         <div className="flex items-center gap-4">
           <button
             onClick={() => onSkip(-5)}
+            type="button"
             className="text-white hover:text-gray-400 cursor-pointer"
           >
             <Rewind size={24} />
           </button>
           <button
             onClick={onPlayPause}
+            type="button"
             className=" text-foreground rounded-full p-3 shadow-lg hover:scale-105 transition-transform cursor-pointer"
           >
             {isPlaying ? <Pause size={28} /> : <Play size={28} />}
           </button>
           <button
             onClick={() => onSkip(5)}
+            type="button"
             className="text-white hover:text-gray-400 cursor-pointer"
           >
             <FastForward size={24} />
@@ -140,6 +140,7 @@ const AudioPlayer = ({ options }: WaveSurferPlayerProps) => {
       <div className="flex items-center gap-2 mt-2">
         <button
           onClick={onMuteToggle}
+          type="button"
           className="text-white hover:text-gray-400"
         >
           {isMuted || volume === 0 ? (

@@ -9,6 +9,10 @@ export const userProfileSchema = z.object({
   avatar: z
     .instanceof(File)
     .refine((file) => file.size !== 0, "Please upload an image")
+    .refine(
+      (file) => file.type.startsWith("image/"),
+      "Only image files are allowed"
+    )
     .optional(),
 });
 

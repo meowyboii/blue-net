@@ -3,7 +3,7 @@ import { Reaction } from "./reaction";
 interface Post {
   id: string;
   content: string;
-  imageUrl?: string;
+  audioUrl?: string;
   authorId: string;
   author: UserProfile;
   reactions: Reaction[];
