@@ -14,7 +14,7 @@ import { PostService } from './post.service';
 import { Post as PostModel } from '@prisma/client';
 import { CreatePostDto } from './dto/create-post.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { CurrentUser } from '../../decorators/current-user.decorator';
 import { UserPayload } from 'src/@types/user-payload';
 import * as multer from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express/multer';
@@ -50,8 +50,8 @@ export class PostController {
   ): Promise<PostModel[]> {
     const posts = await this.postService.posts({
       orderBy: { createdAt: 'desc' },
-      skip: skip ? Number(skip) : undefined,
-      take: take ? Number(take) : undefined,
+      skip: skip !== undefined ? Number(skip) : undefined,
+      take: take !== undefined ? Number(take) : undefined,
     });
     return posts;
   }
@@ -65,8 +65,8 @@ export class PostController {
     const posts = await this.postService.posts({
       where: { authorId: user.id },
       orderBy: { createdAt: 'desc' },
-      skip: skip ? Number(skip) : undefined,
-      take: take ? Number(take) : undefined,
+      skip: skip !== undefined ? Number(skip) : undefined,
+      take: take !== undefined ? Number(take) : undefined,
     });
     return posts;
   }
