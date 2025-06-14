@@ -32,7 +32,6 @@ export default function ProfileSection() {
     resolver: zodResolver(userProfileSchema),
   });
 
-  // Watch the "avatar" field (assuming your file input is named "avatar")
   const avatarFile = watch("avatar");
 
   // Update preview when avatarFile changes
@@ -138,7 +137,7 @@ export default function ProfileSection() {
                   id="displayName"
                   {...register("displayName")}
                   placeholder="Display Name"
-                  value={user.displayName}
+                  defaultValue={user.displayName}
                 />
                 {errors.displayName && (
                   <p className="text-sm text-red-500 mt-2">
@@ -149,7 +148,7 @@ export default function ProfileSection() {
                   placeholder="Bio"
                   className="resize-none h-35 my-4"
                   {...register("bio")}
-                  value={user.bio}
+                  defaultValue={user.bio}
                 />
                 {errors.bio && (
                   <p className="text-sm text-red-500 mt-2">
