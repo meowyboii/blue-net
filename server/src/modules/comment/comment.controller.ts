@@ -11,8 +11,9 @@ import {
 import { CommentService } from './comment.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Comment as CommentModel } from '@prisma/client';
-import { Request } from 'express';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { CurrentUser } from '../../decorators/current-user.decorator';
+import { UserPayload } from 'src/@types/user-payload';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('post/:postId/comments')
@@ -22,9 +23,8 @@ export class CommentController {
   async createComment(
     @Param('postId') postId: string,
     @Body() commentData: CreateCommentDto,
-    @Req() req: Request,
+    @CurrentUser() user: UserPayload,
   ): Promise<CommentModel> {
-    const user = req.user as { id: string };
     return this.commentService.createComment({
       ...commentData,
       postId, // from URL param
