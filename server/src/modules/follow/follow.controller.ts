@@ -3,7 +3,7 @@ import { FollowService } from './follow.service';
 import { Follow as FollowModel } from '@prisma/client';
 import { AuthGuard } from '@nestjs/passport';
 import { UserPayload } from 'src/@types/user-payload';
-import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { CurrentUser } from '../../decorators/current-user.decorator';
 
 @Controller('follow')
 @UseGuards(AuthGuard('jwt'))
