@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
-import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { CurrentUser } from '../../decorators/current-user.decorator';
 import { UserPayload } from 'src/@types/user-payload';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -62,7 +62,6 @@ export class UserController {
     const avatarUrl = file
       ? await this.userService.uploadAvatar(file, user.id)
       : undefined;
-    console.log(avatarUrl);
     const updatedUser = await this.userService.updateUser({
       where: { id: user.id },
       data: {
