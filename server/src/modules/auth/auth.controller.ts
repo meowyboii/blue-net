@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { User as UserModel } from '@prisma/client';
 import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
+import { CurrentUser } from '../../decorators/current-user.decorator';
+import { UserPayload } from 'src/@types/user-payload';
 
 @Controller('auth')
 export class AuthController {
@@ -39,7 +40,7 @@ export class AuthController {
   }
   @UseGuards(AuthGuard('jwt'))
   @Get('me')
-  getProfile(@Req() req: Request) {
-    return req.user; // Contains userId and email from JwtStrategy
+  getProfile(@CurrentUser() user: UserPayload) {
+    return user; // Contains userId and email from JwtStrategy
   }
 }
