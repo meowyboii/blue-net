@@ -3,10 +3,10 @@ import { PostController } from './post.controller';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { NotFoundException } from '@nestjs/common';
+import { UserPayload } from 'src/@types/user-payload';
 
 describe('PostController', () => {
   let postController: PostController;
-  let postService: PostService;
 
   const mockPost = {
     id: 'post-id-1',
@@ -18,7 +18,7 @@ describe('PostController', () => {
     updatedAt: new Date(),
   };
 
-  const mockUser = {
+  const mockUser: UserPayload = {
     id: 'user-id1',
     email: 'test@email.com',
   };
@@ -41,7 +41,6 @@ describe('PostController', () => {
     }).compile();
 
     postController = module.get<PostController>(PostController);
-    postService = module.get<PostService>(PostService);
   });
 
   it('should be defined', () => {
@@ -53,18 +52,15 @@ describe('PostController', () => {
       const createPostDto: CreatePostDto = {
         content: 'Content of the new post',
       };
-
+      mockPostService.createPost.mockResolvedValue(mockPost);
       const result = await postController.createPost(createPostDto, mockUser);
-      jest
-        .spyOn(postService, 'createPost')
-        .mockImplementation(() => Promise.resolve(mockPost));
 
       // Assertions
-      expect(postService.createPost).toHaveBeenCalledWith({
+      expect(mockPostService.createPost).toHaveBeenCalledWith({
         ...createPostDto,
         authorId: mockUser.id,
       });
-      expect(postService.createPost).toHaveBeenCalledTimes(1);
+      expect(mockPostService.createPost).toHaveBeenCalledTimes(1);
       expect(result).toBe(mockPost);
     });
   });
@@ -73,7 +69,7 @@ describe('PostController', () => {
     it('should return all posts', async () => {
       const result = await postController.getPosts(0, 10);
       // Assertions
-      expect(postService.posts).toHaveBeenCalledWith({
+      expect(mockPostService.posts).toHaveBeenCalledWith({
         orderBy: { createdAt: 'desc' },
         skip: 0,
         take: 10,
@@ -85,7 +81,7 @@ describe('PostController', () => {
   describe('getUserPosts', () => {
     it('should return posts for current user', async () => {
       const result = await postController.getUserPosts(mockUser, 0, 10);
-      expect(postService.posts).toHaveBeenCalledWith({
+      expect(mockPostService.posts).toHaveBeenCalledWith({
         where: { authorId: mockUser.id },
         orderBy: { createdAt: 'desc' },
         skip: 0,
@@ -98,12 +94,12 @@ describe('PostController', () => {
   describe('getPost', () => {
     it('should return a post by id', async () => {
       const result = await postController.getPost('post-id-1');
-      expect(postService.post).toHaveBeenCalledWith({ id: 'post-id-1' });
+      expect(mockPostService.post).toHaveBeenCalledWith({ id: 'post-id-1' });
       expect(result).toEqual(mockPost);
     });
 
     it('should throw NotFoundException if post not found', async () => {
-      jest.spyOn(postService, 'post').mockResolvedValueOnce(null);
+      mockPostService.post.mockResolvedValue(null);
       await expect(postController.getPost('missing-id')).rejects.toThrow(
         NotFoundException,
       );
