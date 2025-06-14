@@ -1,17 +1,10 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Body,
-  Req,
-  Param,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, UseGuards } from '@nestjs/common';
 import { ReactionService } from './reaction.service';
 import { Reaction as ReactionModel } from '@prisma/client';
 import { CreateReactionDto } from './dto/create-reaction.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
+import { CurrentUser } from '../../decorators/current-user.decorator';
+import { UserPayload } from 'src/@types/user-payload';
 
 @Controller('reaction')
 export class ReactionController {
@@ -20,9 +13,8 @@ export class ReactionController {
   @Post('create')
   async createReaction(
     @Body() reactionData: CreateReactionDto,
-    @Req() req: Request,
+    @CurrentUser() user: UserPayload,
   ): Promise<ReactionModel> {
-    const user = req.user as { id: string };
     return this.reactionService.createReaction({
       ...reactionData,
       userId: user.id,
